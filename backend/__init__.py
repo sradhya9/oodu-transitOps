@@ -22,6 +22,9 @@ def create_app(config_class=Config):
     app.register_blueprint(main_bp)
     app.register_blueprint(dashboard_bp)
 
+    from backend.routes.vehicle_routes import vehicle_bp
+    app.register_blueprint(vehicle_bp)
+
     # Test database connection on startup
     with app.app_context():
         try:
