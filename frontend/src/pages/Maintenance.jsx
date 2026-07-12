@@ -1,4 +1,6 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useContext } from 'react';
+import { AuthContext } from '../context/AuthContext';
+import { Edit2, Trash2, Plus } from 'lucide-react';
 import {
   getMaintenanceLogs,
   createMaintenance,
@@ -12,6 +14,10 @@ const Maintenance = () => {
   const [logs, setLogs] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  
+  const { user } = useContext(AuthContext);
+  const role = user?.role || '';
+  const canEdit = role === 'Fleet Manager';
   
   // Search & Filter State
   const [searchQuery, setSearchQuery] = useState('');
@@ -220,7 +226,7 @@ const Maintenance = () => {
       {/* Page Header */}
       <div className="page-header" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
         <h1 className="page-title">Maintenance Logs</h1>
-        <button className="btn-primary" onClick={handleOpenAdd}>+ Log Maintenance</button>
+        {canEdit && <button className="btn-primary" onClick={handleOpenAdd}><Plus size={18} strokeWidth={2.5} /> Log Maintenance</button>}
       </div>
 
       {/* Filters/Search Row */}
@@ -270,7 +276,7 @@ const Maintenance = () => {
                 <th>End Date</th>
                 <th>Cost</th>
                 <th>Status</th>
-                <th>Actions</th>
+                {canEdit && <th>Actions</th>}
               </tr>
             </thead>
             <tbody>
@@ -288,10 +294,12 @@ const Maintenance = () => {
                       {log.status}
                     </span>
                   </td>
-                  <td>
-                    <button className="btn-edit" onClick={() => handleOpenEdit(log)}>Edit</button>
-                    <button className="btn-danger" onClick={() => handleDeleteLog(log)}>Delete</button>
-                  </td>
+                  {canEdit && (
+                    <td style={{ display: 'flex', gap: '8px' }}>
+                      <button className="btn-edit btn-icon-only" title="Edit Log" onClick={() => handleOpenEdit(log)}><Edit2 size={16} /></button>
+                      <button className="btn-danger btn-icon-only" title="Delete Log" onClick={() => handleDeleteLog(log)}><Trash2 size={16} /></button>
+                    </td>
+                  )}
                 </tr>
               ))}
             </tbody>

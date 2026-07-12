@@ -1,4 +1,6 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useContext } from 'react';
+import { AuthContext } from '../context/AuthContext';
+import { Edit2, Trash2, Plus } from 'lucide-react';
 import {
   getFuelLogs,
   createFuelLog,
@@ -15,6 +17,11 @@ const FuelLogs = () => {
   const [logs, setLogs] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+
+  const { user } = useContext(AuthContext);
+  const role = user?.role || '';
+  const canAdd = role === 'Financial Analyst' || role === 'Dispatcher';
+  const canEdit = role === 'Financial Analyst';
 
   // Search state for fuel logs
   const [searchQuery, setSearchQuery] = useState('');
@@ -259,9 +266,11 @@ const FuelLogs = () => {
                 onChange={(e) => setSearchQuery(e.target.value)}
               />
             </div>
-            <button className="btn-primary" onClick={handleOpenAdd} style={{ alignSelf: 'flex-end' }}>
-              + Log Fuel
-            </button>
+            {canAdd && (
+              <button className="btn-primary" onClick={handleOpenAdd} style={{ alignSelf: 'flex-end' }}>
+                <Plus size={18} strokeWidth={2.5} /> Log Fuel
+              </button>
+            )}
           </div>
 
           {error && <div className="error-alert">{error}</div>}
@@ -283,7 +292,7 @@ const FuelLogs = () => {
                     <th>Fuel Cost</th>
                     <th>Fuel Date</th>
                     <th>Odometer</th>
-                    <th>Actions</th>
+                    {canEdit && <th>Actions</th>}
                   </tr>
                 </thead>
                 <tbody>
@@ -296,10 +305,12 @@ const FuelLogs = () => {
                       <td>₹{log.fuel_cost.toFixed(2)}</td>
                       <td>{log.fuel_date}</td>
                       <td>{log.odometer !== null ? `${log.odometer.toLocaleString()} km` : <span style={{ color: '#9CA3AF' }}>—</span>}</td>
-                      <td>
-                        <button className="btn-edit" onClick={() => handleOpenEdit(log)}>Edit</button>
-                        <button className="btn-danger" onClick={() => handleDeleteLog(log.id)}>Delete</button>
-                      </td>
+                      {canEdit && (
+                        <td style={{ display: 'flex', gap: '8px' }}>
+                          <button className="btn-edit btn-icon-only" title="Edit Fuel Log" onClick={() => handleOpenEdit(log)}><Edit2 size={16} /></button>
+                          <button className="btn-danger btn-icon-only" title="Delete Fuel Log" onClick={() => handleDeleteLog(log.id)}><Trash2 size={16} /></button>
+                        </td>
+                      )}
                     </tr>
                   ))}
                 </tbody>
