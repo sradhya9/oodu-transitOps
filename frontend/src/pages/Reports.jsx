@@ -427,12 +427,38 @@ const Reports = () => {
                     </div>
                   )}
                 </div>
+
+                {/* Section 2b: Visual Efficiency Comparison */}
+                <div className="report-section-card">
+                  <h2>Visual Efficiency Comparison</h2>
+                  {fuelEfficiencyData.length > 0 ? (
+                    <div className="bar-chart-container" style={{ marginTop: '0' }}>
+                      {fuelEfficiencyData.map((d) => {
+                        const pct = maxFuelEfficiency > 0 ? (d.fuel_efficiency / maxFuelEfficiency) * 100 : 0;
+                        return (
+                          <BarRow 
+                            key={d.vehicle_id}
+                            label={d.registration_number || `Vehicle #${d.vehicle_id}`} 
+                            percentage={pct} 
+                            valueText={`${d.fuel_efficiency.toFixed(1)} km/L`}
+                            color="#3B82F6"
+                          />
+                        );
+                      })}
+                    </div>
+                  ) : (
+                    <div className="empty-state">
+                      <h3>No Efficiency Data</h3>
+                      <p>Trip distances and fuel consumption logs are required to compute efficiency metrics.</p>
+                    </div>
+                  )}
+                </div>
               </div>
 
               {/* Right Column */}
               <div style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
                 
-                {/* Section 2: Fuel Efficiency Table & Horizontal Bar Chart */}
+                {/* Section 2a: Fuel Efficiency Table */}
                 <div className="report-section-card">
                   <h2>Fuel Efficiency by Vehicle</h2>
                   {fuelEfficiencyData.length > 0 ? (
@@ -459,22 +485,6 @@ const Reports = () => {
                           ))}
                         </tbody>
                       </table>
-
-                      <div className="bar-chart-container">
-                        <span className="filter-label" style={{ marginBottom: '8px' }}>Visual Efficiency Comparison</span>
-                        {fuelEfficiencyData.map((d) => {
-                          const pct = maxFuelEfficiency > 0 ? (d.fuel_efficiency / maxFuelEfficiency) * 100 : 0;
-                          return (
-                            <BarRow 
-                              key={d.vehicle_id}
-                              label={d.registration_number || `Vehicle #${d.vehicle_id}`} 
-                              percentage={pct} 
-                              valueText={`${d.fuel_efficiency.toFixed(1)} km/L`}
-                              color="#3B82F6"
-                            />
-                          );
-                        })}
-                      </div>
                     </div>
                   ) : (
                     <div className="empty-state">
