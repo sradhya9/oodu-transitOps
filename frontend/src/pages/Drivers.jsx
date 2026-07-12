@@ -15,6 +15,7 @@ const Drivers = () => {
   const role = user?.role || '';
   const canAdd = role === 'Fleet Manager';
   const canEdit = role === 'Fleet Manager' || role === 'Safety Officer';
+  const isSafetyOfficer = role === 'Safety Officer';
 
   // Filters
   const [search, setSearch] = useState("");
@@ -364,7 +365,7 @@ const Drivers = () => {
             <div className="view-details">
               <div className="form-group">
                 <label>Full Name *</label>
-                <input type="text" name="full_name" className="form-control" required value={formData.full_name} onChange={handleInputChange} />
+                <input type="text" name="full_name" className="form-control" required value={formData.full_name} onChange={handleInputChange} disabled={modalMode === "edit" && isSafetyOfficer} />
               </div>
 
               <div className="form-group">
@@ -389,7 +390,7 @@ const Drivers = () => {
 
               <div className="form-group">
                 <label>Contact Number *</label>
-                <input type="text" name="contact_number" className="form-control" required value={formData.contact_number} onChange={handleInputChange} />
+                <input type="text" name="contact_number" className="form-control" required value={formData.contact_number} onChange={handleInputChange} disabled={modalMode === "edit" && isSafetyOfficer} />
               </div>
 
               <div className="form-group">

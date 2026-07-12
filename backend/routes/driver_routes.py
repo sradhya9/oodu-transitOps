@@ -211,6 +211,7 @@ def create_driver():
 @authorize(roles=['Fleet Manager', 'Safety Officer'])
 def update_driver(id):
     try:
+        from flask import g
         driver = Driver.query.get(id)
         if not driver:
             return jsonify({'success': False, 'message': 'Driver not found'}), 404
@@ -223,9 +224,12 @@ def update_driver(id):
              # But admin might need to override. We'll allow it but usually it's handled by Trip dispatch.
              pass
         
-        driver.full_name = data.get('full_name', driver.full_name)
         driver.license_category = data.get('license_category', driver.license_category)
-        driver.contact_number = data.get('contact_number', driver.contact_number)
+        
+        # Enforce Role restrictions on editing core PII
+        if g.current_user.role.role_name != 'Safety Officer':
+            driver.full_name = data.get('full_name', driver.full_name)
+            driver.contact_number = data.get('contact_number', driver.contact_number)
         
         if 'safety_score' in data:
             driver.safety_score = float(data['safety_score'])
