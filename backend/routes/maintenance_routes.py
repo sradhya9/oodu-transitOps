@@ -1,7 +1,7 @@
 from flask import Blueprint, request, jsonify
 from datetime import datetime
 from backend.database import db
-from backend.models.maintenance import MaintenanceLog
+from backend.database.models import MaintenanceLog
 
 maintenance_bp = Blueprint('maintenance', __name__, url_prefix='/maintenance')
 

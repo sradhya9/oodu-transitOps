@@ -1,7 +1,7 @@
 from flask import Blueprint, request, jsonify
 from datetime import datetime
 from backend.database import db
-from backend.models.expense import Expense
+from backend.database.models import Expense
 
 expense_bp = Blueprint('expenses', __name__, url_prefix='/expenses')
 

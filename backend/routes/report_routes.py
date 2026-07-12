@@ -3,9 +3,7 @@ import io
 from flask import Blueprint, jsonify, Response
 from sqlalchemy import text
 from backend.database import db
-from backend.models.maintenance import MaintenanceLog
-from backend.models.fuel import FuelLog
-from backend.models.expense import Expense
+from backend.database.models import MaintenanceLog, FuelLog, Expense
 
 report_bp = Blueprint('reports', __name__, url_prefix='/reports')
 

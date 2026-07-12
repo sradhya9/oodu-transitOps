@@ -1,7 +1,7 @@
 from flask import Blueprint, request, jsonify
 from datetime import datetime
 from backend.database import db
-from backend.models.fuel import FuelLog
+from backend.database.models import FuelLog
 
 fuel_bp = Blueprint('fuel', __name__, url_prefix='/fuel')
 
