@@ -184,7 +184,7 @@ body {
   color: var(--text-muted);
 }
 
-.search-input {
+.search-wrapper .search-input {
   width: 320px;
   padding: 10px 16px 10px 36px;
   border: 1px solid var(--border-color);
@@ -198,7 +198,7 @@ body {
   box-shadow: var(--shadow-sm);
 }
 
-.search-input:focus {
+.search-wrapper .search-input:focus {
   border-color: var(--accent-color);
   box-shadow: 0 0 0 3px rgba(255, 91, 4, 0.15);
 }
@@ -317,7 +317,7 @@ body {
     display: block;
   }
 
-  .search-input {
+  .search-wrapper .search-input {
     width: 200px;
   }
 
