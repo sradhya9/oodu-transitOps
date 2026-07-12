@@ -10,7 +10,7 @@ driver_bp = Blueprint('driver', __name__, url_prefix='/api/drivers')
 
 @driver_bp.route('', methods=['GET'])
 @authenticate()
-@authorize(roles=['Fleet Manager', 'Safety Officer'])
+@authorize(roles=['Fleet Manager', 'Safety Officer', 'Dispatcher'])
 def get_drivers():
     try:
         # Pagination parameters
@@ -112,7 +112,7 @@ def get_drivers():
 
 @driver_bp.route('/available', methods=['GET'])
 @authenticate()
-@authorize(roles=['Fleet Manager', 'Safety Officer'])
+@authorize(roles=['Fleet Manager', 'Safety Officer', 'Dispatcher'])
 def get_available_drivers():
     try:
         from flask import g

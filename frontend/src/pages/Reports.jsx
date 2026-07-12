@@ -5,7 +5,8 @@ import {
   getFuelEfficiency,
   getFleetUtilization,
   getVehicleROI,
-  getOperationalCost
+  getOperationalCost,
+  exportReportCSV
 } from '../services/reportService';
 import { getMaintenanceLogs } from '../services/maintenanceService';
 import '../styles/dashboard.css';
@@ -239,10 +240,7 @@ const Reports = () => {
               flexDirection: 'column',
               padding: '6px 0'
             }}>
-              <a 
-                href="http://localhost:5000/reports/export/maintenance" 
-                target="_blank" 
-                rel="noreferrer"
+              <button 
                 style={{
                   padding: '10px 16px',
                   textDecoration: 'none',
@@ -253,17 +251,15 @@ const Reports = () => {
                   cursor: 'pointer',
                   border: 'none',
                   background: 'none',
-                  display: 'block'
+                  display: 'block',
+                  width: '100%'
                 }}
                 className="dropdown-item"
-                onClick={() => setDropdownOpen(false)}
+                onClick={() => { setDropdownOpen(false); exportReportCSV('maintenance', 'maintenance_report.csv'); }}
               >
                 Export Maintenance CSV
-              </a>
-              <a 
-                href="http://localhost:5000/reports/export/fuel" 
-                target="_blank" 
-                rel="noreferrer"
+              </button>
+              <button 
                 style={{
                   padding: '10px 16px',
                   textDecoration: 'none',
@@ -275,17 +271,15 @@ const Reports = () => {
                   border: 'none',
                   background: 'none',
                   borderTop: '1px solid var(--card-border)',
-                  display: 'block'
+                  display: 'block',
+                  width: '100%'
                 }}
                 className="dropdown-item"
-                onClick={() => setDropdownOpen(false)}
+                onClick={() => { setDropdownOpen(false); exportReportCSV('fuel', 'fuel_logs_report.csv'); }}
               >
                 Export Fuel Logs CSV
-              </a>
-              <a 
-                href="http://localhost:5000/reports/export/expenses" 
-                target="_blank" 
-                rel="noreferrer"
+              </button>
+              <button 
                 style={{
                   padding: '10px 16px',
                   textDecoration: 'none',
@@ -297,17 +291,15 @@ const Reports = () => {
                   border: 'none',
                   background: 'none',
                   borderTop: '1px solid var(--card-border)',
-                  display: 'block'
+                  display: 'block',
+                  width: '100%'
                 }}
                 className="dropdown-item"
-                onClick={() => setDropdownOpen(false)}
+                onClick={() => { setDropdownOpen(false); exportReportCSV('expenses', 'expense_report.csv'); }}
               >
                 Export Expense CSV
-              </a>
-              <a 
-                href="http://localhost:5000/reports/export/operational-cost" 
-                target="_blank" 
-                rel="noreferrer"
+              </button>
+              <button 
                 style={{
                   padding: '10px 16px',
                   textDecoration: 'none',
@@ -319,13 +311,14 @@ const Reports = () => {
                   border: 'none',
                   background: 'none',
                   borderTop: '1px solid var(--card-border)',
-                  display: 'block'
+                  display: 'block',
+                  width: '100%'
                 }}
                 className="dropdown-item"
-                onClick={() => setDropdownOpen(false)}
+                onClick={() => { setDropdownOpen(false); exportReportCSV('operational-cost', 'operational_cost_report.csv'); }}
               >
                 Export Operational Cost CSV
-              </a>
+              </button>
             </div>
           )}
         </div>
