@@ -2,7 +2,7 @@ from flask import Blueprint, request, jsonify, g
 from datetime import datetime
 from backend.database import db
 from backend.database.models import FuelLog
-from backend.middleware.auth import authenticate
+from backend.middleware.auth import authenticate, authorize
 
 fuel_bp = Blueprint('fuel_logs', __name__, url_prefix='/fuel-logs')
 
@@ -30,6 +30,7 @@ def parse_date(date_str):
 # GET /fuel-logs - Return all fuel records
 @fuel_bp.route('', methods=['GET'])
 @authenticate()
+@authorize(roles=['Financial Analyst'])
 def get_all_fuel_logs():
     try:
         user = g.current_user
@@ -44,6 +45,8 @@ def get_all_fuel_logs():
 
 # GET /fuel/<id> - Return one fuel log
 @fuel_bp.route('/<int:log_id>', methods=['GET'])
+@authenticate()
+@authorize(roles=['Financial Analyst'])
 def get_fuel(log_id):
     try:
         log = FuelLog.query.get(log_id)
@@ -56,6 +59,7 @@ def get_fuel(log_id):
 # POST /fuel-logs - Create a new fuel record
 @fuel_bp.route('', methods=['POST'])
 @authenticate()
+@authorize(roles=['Financial Analyst'])
 def create_fuel_log():
     data = request.get_json() or {}
     errors = {}
@@ -165,6 +169,7 @@ def create_fuel_log():
 # PUT /fuel-logs/<id> - Update an existing fuel record
 @fuel_bp.route('/<int:log_id>', methods=['PUT'])
 @authenticate()
+@authorize(roles=['Financial Analyst'])
 def update_fuel_log(log_id):
     try:
         log = FuelLog.query.get(log_id)
@@ -265,6 +270,7 @@ def update_fuel_log(log_id):
 # DELETE /fuel-logs/<id> - Delete a fuel record
 @fuel_bp.route('/<int:log_id>', methods=['DELETE'])
 @authenticate()
+@authorize(roles=['Financial Analyst'])
 def delete_fuel_log(log_id):
     try:
         log = FuelLog.query.get(log_id)

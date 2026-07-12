@@ -3,10 +3,13 @@ from datetime import datetime
 from sqlalchemy import or_, desc, asc
 from sqlalchemy.exc import IntegrityError
 from backend.database.models import db, Driver
+from backend.middleware.auth import authenticate, authorize
 
 driver_bp = Blueprint('driver', __name__, url_prefix='/api/drivers')
 
 @driver_bp.route('', methods=['GET'])
+@authenticate()
+@authorize(roles=['Fleet Manager', 'Safety Officer'])
 def get_drivers():
     try:
         # Pagination parameters
@@ -101,6 +104,8 @@ def get_drivers():
 
 
 @driver_bp.route('/available', methods=['GET'])
+@authenticate()
+@authorize(roles=['Fleet Manager', 'Safety Officer'])
 def get_available_drivers():
     try:
         # Filter: Status=Available, Not Suspended, License Valid
@@ -124,6 +129,8 @@ def get_available_drivers():
 
 
 @driver_bp.route('/<int:id>', methods=['GET'])
+@authenticate()
+@authorize(roles=['Fleet Manager', 'Safety Officer'])
 def get_driver(id):
     try:
         driver = Driver.query.get(id)
@@ -147,6 +154,8 @@ def get_driver(id):
 
 
 @driver_bp.route('', methods=['POST'])
+@authenticate()
+@authorize(roles=['Fleet Manager', 'Safety Officer'])
 def create_driver():
     try:
         data = request.json
@@ -191,6 +200,8 @@ def create_driver():
 
 
 @driver_bp.route('/<int:id>', methods=['PUT'])
+@authenticate()
+@authorize(roles=['Fleet Manager', 'Safety Officer'])
 def update_driver(id):
     try:
         driver = Driver.query.get(id)
@@ -243,6 +254,8 @@ def update_driver(id):
 
 
 @driver_bp.route('/<int:id>', methods=['DELETE'])
+@authenticate()
+@authorize(roles=['Fleet Manager', 'Safety Officer'])
 def delete_driver(id):
     try:
         driver = Driver.query.get(id)

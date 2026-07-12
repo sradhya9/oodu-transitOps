@@ -2,6 +2,7 @@ from flask import Blueprint, request, jsonify
 from datetime import datetime
 from backend.database import db
 from backend.database.models import MaintenanceLog
+from backend.middleware.auth import authenticate, authorize
 
 maintenance_bp = Blueprint('maintenance', __name__, url_prefix='/maintenance')
 
@@ -31,6 +32,8 @@ def parse_date(date_str):
 
 # GET /maintenance - Return all maintenance records ordered by newest first
 @maintenance_bp.route('', methods=['GET'])
+@authenticate()
+@authorize(roles=['Fleet Manager', 'Financial Analyst'])
 def get_all_maintenance():
     try:
         logs = MaintenanceLog.query.order_by(MaintenanceLog.created_at.desc(), MaintenanceLog.id.desc()).all()
@@ -40,6 +43,8 @@ def get_all_maintenance():
 
 # GET /maintenance/<id> - Return a single maintenance record
 @maintenance_bp.route('/<int:log_id>', methods=['GET'])
+@authenticate()
+@authorize(roles=['Fleet Manager', 'Financial Analyst'])
 def get_maintenance(log_id):
     try:
         log = MaintenanceLog.query.get(log_id)
@@ -51,6 +56,8 @@ def get_maintenance(log_id):
 
 # POST /maintenance - Create a new maintenance record
 @maintenance_bp.route('', methods=['POST'])
+@authenticate()
+@authorize(roles=['Fleet Manager'])
 def create_maintenance():
     data = request.get_json() or {}
     
@@ -126,6 +133,8 @@ def create_maintenance():
 
 # PUT /maintenance/<id> - Update an existing maintenance record
 @maintenance_bp.route('/<int:log_id>', methods=['PUT'])
+@authenticate()
+@authorize(roles=['Fleet Manager'])
 def update_maintenance(log_id):
     try:
         log = MaintenanceLog.query.get(log_id)
@@ -192,6 +201,8 @@ def update_maintenance(log_id):
 
 # DELETE /maintenance/<id> - Delete a maintenance record
 @maintenance_bp.route('/<int:log_id>', methods=['DELETE'])
+@authenticate()
+@authorize(roles=['Fleet Manager'])
 def delete_maintenance(log_id):
     try:
         log = MaintenanceLog.query.get(log_id)
