@@ -2,10 +2,12 @@ from flask import Blueprint, jsonify
 from sqlalchemy import func
 from backend.database import db
 from backend.database.models import Vehicle, Driver, Trip
+from backend.middleware.auth import authenticate, authorize
 
 dashboard_bp = Blueprint('dashboard', __name__, url_prefix='/api/dashboard')
 
 @dashboard_bp.route('/stats', methods=['GET'])
+@authenticate()
 def get_dashboard_stats():
     try:
         # Vehicles
@@ -43,6 +45,7 @@ def get_dashboard_stats():
         return jsonify({"error": "Failed to fetch dashboard statistics"}), 500
 
 @dashboard_bp.route('/recent-trips', methods=['GET'])
+@authenticate()
 def get_recent_trips():
     try:
         # Fetch top 5 recent trips, order by id desc (or created_at)

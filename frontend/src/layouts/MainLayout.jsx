@@ -1,16 +1,20 @@
-import { useState, useEffect } from 'react';
-import { Outlet, NavLink, Link, useLocation } from 'react-router-dom';
+import { useState, useEffect, useContext } from 'react';
+import { Outlet, NavLink, Link, useLocation, useNavigate } from 'react-router-dom';
 import { 
   LayoutDashboard, Truck, Users, Route, 
   Wrench, Droplet, PieChart, Settings, 
-  Sun, Moon, Search, Menu 
+  Sun, Moon, Search, Menu, LogOut
 } from 'lucide-react';
+import { AuthContext } from '../context/AuthContext';
 import '../styles/layout.css';
 
 const MainLayout = () => {
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [theme, setTheme] = useState(localStorage.getItem('theme') || 'light');
+  
+  const { user, logout } = useContext(AuthContext);
   const location = useLocation();
+  const navigate = useNavigate();
 
   useEffect(() => {
     document.documentElement.setAttribute('data-theme', theme);
@@ -25,16 +29,25 @@ const MainLayout = () => {
     setSidebarOpen(!sidebarOpen);
   };
 
-  const navLinks = [
-    { path: '/dashboard', label: 'Dashboard', icon: <LayoutDashboard size={18} strokeWidth={2.2} /> },
-    { path: '/vehicles', label: 'Fleet', icon: <Truck size={18} strokeWidth={2.2} /> },
-    { path: '/drivers', label: 'Drivers', icon: <Users size={18} strokeWidth={2.2} /> },
-    { path: '/trips', label: 'Trips', icon: <Route size={18} strokeWidth={2.2} /> },
-    { path: '/maintenance', label: 'Maintenance', icon: <Wrench size={18} strokeWidth={2.2} /> },
-    { path: '/fuel-logs', label: 'Fuel & Expenses', icon: <Droplet size={18} strokeWidth={2.2} /> },
-    { path: '/reports', label: 'Analytics', icon: <PieChart size={18} strokeWidth={2.2} /> },
-    { path: '/settings', label: 'Settings', icon: <Settings size={18} strokeWidth={2.2} /> }
+  const handleLogout = () => {
+    logout();
+    navigate('/login', { replace: true });
+  };
+
+  // Define all links with required roles
+  const allNavLinks = [
+    { path: '/dashboard', label: 'Dashboard', icon: <LayoutDashboard size={18} strokeWidth={2.2} />, roles: ['Fleet Manager', 'Dispatcher', 'Safety Officer', 'Financial Analyst'] },
+    { path: '/vehicles', label: 'Fleet', icon: <Truck size={18} strokeWidth={2.2} />, roles: ['Fleet Manager'] },
+    { path: '/drivers', label: 'Drivers', icon: <Users size={18} strokeWidth={2.2} />, roles: ['Fleet Manager', 'Safety Officer'] },
+    { path: '/trips', label: 'Trips', icon: <Route size={18} strokeWidth={2.2} />, roles: ['Fleet Manager', 'Dispatcher'] },
+    { path: '/maintenance', label: 'Maintenance', icon: <Wrench size={18} strokeWidth={2.2} />, roles: ['Fleet Manager'] },
+    { path: '/fuel-logs', label: 'Expenses', icon: <Droplet size={18} strokeWidth={2.2} />, roles: ['Fleet Manager', 'Financial Analyst'] },
+    { path: '/reports', label: 'Reports', icon: <PieChart size={18} strokeWidth={2.2} />, roles: ['Fleet Manager', 'Safety Officer', 'Financial Analyst'] },
+    { path: '/settings', label: 'Settings', icon: <Settings size={18} strokeWidth={2.2} />, roles: ['Fleet Manager'] }
   ];
+
+  // Filter links based on current user role
+  const navLinks = allNavLinks.filter(link => user && link.roles.includes(user.role));
 
   return (
     <div className="layout-container">
@@ -88,11 +101,21 @@ const MainLayout = () => {
             </button>
             <div className="user-profile">
               <div className="user-info">
-                <span className="user-name">Raven K.</span>
-                <span className="user-badge">Dispatcher <span style={{marginLeft: '4px', fontSize: '10px'}}>▼</span></span>
+                <span className="user-name">{user?.name || 'Loading...'}</span>
+                <span className="user-badge">{user?.role || 'User'}</span>
               </div>
-              <div className="avatar">RK</div>
+              <div className="avatar">
+                {user?.name ? user.name.split(' ').map(n => n[0]).join('').substring(0, 2).toUpperCase() : 'US'}
+              </div>
             </div>
+            <button 
+              onClick={handleLogout} 
+              className="theme-toggle-btn" 
+              aria-label="Logout" 
+              style={{ marginLeft: '12px' }}
+            >
+              <LogOut size={20} />
+            </button>
           </div>
         </header>
 

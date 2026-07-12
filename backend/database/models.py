@@ -1,4 +1,5 @@
 from datetime import datetime
+from werkzeug.security import generate_password_hash, check_password_hash
 from backend.database import db
 
 class Role(db.Model):
@@ -21,6 +22,12 @@ class User(db.Model):
     updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
     
     role = db.relationship('Role', backref=db.backref('users', lazy=True))
+
+    def set_password(self, password):
+        self.password_hash = generate_password_hash(password)
+
+    def check_password(self, password):
+        return check_password_hash(self.password_hash, password)
 
 class Vehicle(db.Model):
     __tablename__ = 'vehicles'
@@ -121,3 +128,15 @@ class Expense(db.Model):
     
     vehicle = db.relationship('Vehicle', backref=db.backref('expenses', lazy=True))
     trip = db.relationship('Trip', backref=db.backref('expenses', lazy=True))
+
+class PasswordResetRequest(db.Model):
+    __tablename__ = 'password_reset_requests'
+    id = db.Column(db.Integer, primary_key=True, autoincrement=True)
+    user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
+    special_access_code = db.Column(db.String(50))
+    emailed_code = db.Column(db.String(50))
+    status = db.Column(db.Enum('Pending', 'Approved', 'Completed', name='reset_status_enum'), default='Pending')
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+    expires_at = db.Column(db.DateTime)
+    
+    user = db.relationship('User', backref=db.backref('password_resets', lazy=True))
