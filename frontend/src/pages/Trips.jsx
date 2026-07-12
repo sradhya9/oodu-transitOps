@@ -49,6 +49,8 @@ const Trips = () => {
     revenue: ""
   });
 
+  const [formErrors, setFormErrors] = useState({});
+
   // Toasts
   const [toasts, setToasts] = useState([]);
   
@@ -151,6 +153,7 @@ const Trips = () => {
         fuel_consumed: "",
         revenue: ""
       });
+      setFormErrors({});
     }
     setIsModalOpen(true);
   };
@@ -183,6 +186,32 @@ const Trips = () => {
       }
     } catch (error) {
       showToast(error.response?.data?.message || "Creation failed", "error");
+    }
+  };
+
+  const handleCompleteSubmit = async (e) => {
+    if (e) e.preventDefault();
+    setFormErrors({});
+    try {
+      const res = await completeTrip(selectedTrip.id, completionData);
+      if (res.success) {
+        showToast(res.message);
+        closeModal();
+        fetchTrips();
+      } else {
+        if (res.message && res.message.toLowerCase().includes("odometer")) {
+          setFormErrors({ end_odometer: res.message });
+        } else {
+          showToast(res.message, "error");
+        }
+      }
+    } catch (error) {
+      const msg = error.response?.data?.message || "Completion failed";
+      if (msg.toLowerCase().includes("odometer")) {
+        setFormErrors({ end_odometer: msg });
+      } else {
+        showToast(msg, "error");
+      }
     }
   };
 
@@ -432,25 +461,26 @@ const Trips = () => {
       {/* Complete Trip Modal */}
       {modalMode === "complete" && (
         <Modal isOpen={isModalOpen} onClose={closeModal} title={`Complete Trip: ${selectedTrip?.trip_number}`}>
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+          <form onSubmit={handleCompleteSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
             <p>Please enter the final trip details before completing.</p>
             <div className="form-group" style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
               <label>Final Odometer Reading</label>
               <input type="number" name="end_odometer" className="filter-select" required value={completionData.end_odometer} onChange={handleCompletionChange} />
+              {formErrors.end_odometer && <span style={{ color: '#EF4444', fontSize: '13px', marginTop: '4px' }}>{formErrors.end_odometer}</span>}
             </div>
             <div className="form-group" style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
               <label>Fuel Consumed (Liters)</label>
-              <input type="number" name="fuel_consumed" className="filter-select" required value={completionData.fuel_consumed} onChange={handleCompletionChange} />
+              <input type="number" name="fuel_consumed" className="filter-select" value={completionData.fuel_consumed} onChange={handleCompletionChange} />
             </div>
             <div className="form-group" style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
               <label>Revenue Generated ($)</label>
-              <input type="number" name="revenue" className="filter-select" required value={completionData.revenue} onChange={handleCompletionChange} />
+              <input type="number" name="revenue" className="filter-select" value={completionData.revenue} onChange={handleCompletionChange} />
             </div>
             <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '12px', marginTop: '16px' }}>
-              <button className="btn-secondary" style={{ padding: '8px 16px', cursor: 'pointer' }} onClick={closeModal}>Cancel</button>
-              <button className="btn-primary" style={{ padding: '8px 16px', background: '#10B981', color: '#fff', border: 'none', borderRadius: '4px', cursor: 'pointer' }} onClick={() => handleAction(completeTrip, selectedTrip.id, completionData)}>Mark as Completed</button>
+              <button type="button" className="btn-secondary" style={{ padding: '8px 16px', cursor: 'pointer' }} onClick={closeModal}>Cancel</button>
+              <button type="submit" className="btn-primary" style={{ padding: '8px 16px', background: '#10B981', color: '#fff', border: 'none', borderRadius: '4px', cursor: 'pointer' }}>Mark as Completed</button>
             </div>
-          </div>
+          </form>
         </Modal>
       )}
 
