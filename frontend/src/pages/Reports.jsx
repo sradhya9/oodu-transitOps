@@ -487,7 +487,19 @@ const Reports = () => {
                 {/* Section 4: Fleet Utilization Card */}
                 <div className="report-section-card">
                   <h2>Fleet Utilization</h2>
-                  {fleetUtilizationData?.status === 'pending_integration' ? (
+                  {fleetUtilizationData?.status === 'success' ? (
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
+                      <div className="kpi-card blue" style={{ marginTop: '8px' }}>
+                        <span className="kpi-label">Current Fleet Utilization</span>
+                        <span className="kpi-value">{fleetUtilizationData.fleet_utilization}%</span>
+                      </div>
+                      <div className="info-banner" style={{ backgroundColor: '#F8FAFC', border: '1px solid #E2E8F0', color: '#475569' }}>
+                        <p style={{ margin: 0, fontSize: '0.9rem' }}>
+                          <strong>{fleetUtilizationData.vehicles_on_trip}</strong> out of <strong>{fleetUtilizationData.total_vehicles}</strong> available vehicles are currently on active trips.
+                        </p>
+                      </div>
+                    </div>
+                  ) : fleetUtilizationData?.status === 'pending_integration' ? (
                     <PendingBanner 
                       title="Integration Pending" 
                       message={fleetUtilizationData.message} 
@@ -506,7 +518,19 @@ const Reports = () => {
           ) : (
             <div className="report-section-card">
               <h2>Fleet Utilization</h2>
-              {fleetUtilizationData?.status === 'pending_integration' ? (
+              {fleetUtilizationData?.status === 'success' ? (
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
+                  <div className="kpi-card blue" style={{ marginTop: '8px' }}>
+                    <span className="kpi-label">Current Fleet Utilization</span>
+                    <span className="kpi-value">{fleetUtilizationData.fleet_utilization}%</span>
+                  </div>
+                  <div className="info-banner" style={{ backgroundColor: '#F8FAFC', border: '1px solid #E2E8F0', color: '#475569' }}>
+                    <p style={{ margin: 0, fontSize: '0.9rem' }}>
+                      <strong>{fleetUtilizationData.vehicles_on_trip}</strong> out of <strong>{fleetUtilizationData.total_vehicles}</strong> available vehicles are currently on active trips.
+                    </p>
+                  </div>
+                </div>
+              ) : fleetUtilizationData?.status === 'pending_integration' ? (
                 <PendingBanner 
                   title="Integration Pending" 
                   message={fleetUtilizationData.message} 
@@ -527,7 +551,34 @@ const Reports = () => {
         {canViewFinancials && (
           <div className="report-section-card">
             <h2>Vehicle ROI Analysis</h2>
-            {vehicleRoiData?.status === 'pending_integration' ? (
+            {vehicleRoiData?.status === 'success' && vehicleRoiData.roi_records.length > 0 ? (
+              <table className="trips-table">
+                <thead>
+                  <tr>
+                    <th>Registration</th>
+                    <th style={{ textAlign: 'right' }}>Revenue</th>
+                    <th style={{ textAlign: 'right' }}>Maintenance</th>
+                    <th style={{ textAlign: 'right' }}>Fuel Cost</th>
+                    <th style={{ textAlign: 'right' }}>Acq. Cost</th>
+                    <th style={{ textAlign: 'right' }}>ROI %</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {vehicleRoiData.roi_records.map((roi) => (
+                    <tr key={roi.vehicle_id}>
+                      <td style={{ fontWeight: '500' }}>{roi.registration_number}</td>
+                      <td style={{ textAlign: 'right', color: '#10B981' }}>{formatCurrency(roi.total_revenue)}</td>
+                      <td style={{ textAlign: 'right', color: '#EF4444' }}>{formatCurrency(roi.total_maintenance)}</td>
+                      <td style={{ textAlign: 'right', color: '#F59E0B' }}>{formatCurrency(roi.total_fuel)}</td>
+                      <td style={{ textAlign: 'right' }}>{formatCurrency(roi.acquisition_cost)}</td>
+                      <td style={{ textAlign: 'right', fontWeight: 'bold', color: roi.roi_percentage >= 0 ? '#10B981' : '#EF4444' }}>
+                        {roi.roi_percentage > 0 ? '+' : ''}{roi.roi_percentage.toFixed(1)}%
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            ) : vehicleRoiData?.status === 'pending_integration' ? (
               <PendingBanner 
                 title="Integration Pending" 
                 message={vehicleRoiData.message} 
