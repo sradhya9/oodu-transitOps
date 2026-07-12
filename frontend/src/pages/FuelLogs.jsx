@@ -293,7 +293,7 @@ const FuelLogs = () => {
                       <td>{log.vehicle_id}</td>
                       <td>{log.trip_id !== null ? log.trip_id : <span style={{ color: '#9CA3AF' }}>—</span>}</td>
                       <td>{log.liters.toFixed(2)} L</td>
-                      <td>${log.fuel_cost.toFixed(2)}</td>
+                      <td>₹{log.fuel_cost.toFixed(2)}</td>
                       <td>{log.fuel_date}</td>
                       <td>{log.odometer !== null ? `${log.odometer.toLocaleString()} km` : <span style={{ color: '#9CA3AF' }}>—</span>}</td>
                       <td>
@@ -373,7 +373,7 @@ const FuelLogs = () => {
                 </div>
 
                 <div className="form-group">
-                  <label className="form-label">Fuel Cost ($) *</label>
+                  <label className="form-label">Fuel Cost (₹) *</label>
                   <input
                     type="text"
                     name="fuel_cost"

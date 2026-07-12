@@ -14,11 +14,9 @@ import '../styles/maintenance.css';
 // Reusable Helper Functions & Component Views
 // ==========================================
 
-const formatCurrency = (val) => {
-  return typeof val === 'number'
-    ? `$${val.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`
-    : '$0.00';
-};
+const formatCurrency = (val) => val !== null && val !== undefined
+  ? `₹${val.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`
+  : '₹0.00';
 
 const KpiCard = ({ title, value, color }) => (
   <div className={`kpi-card ${color}`}>

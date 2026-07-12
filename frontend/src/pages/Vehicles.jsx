@@ -304,7 +304,7 @@ const Vehicles = () => {
                     <td>{v.vehicle_type}</td>
                     <td>{v.max_load_capacity}</td>
                     <td>{v.odometer}</td>
-                    <td>${v.acquisition_cost}</td>
+                    <td>₹{v.acquisition_cost}</td>
                     <td>{v.acquisition_date}</td>
                     <td><span className={`status-badge ${getStatusClass(v.status)}`}>{v.status}</span></td>
                     <td className="actions-cell">
@@ -359,7 +359,7 @@ const Vehicles = () => {
               <div className="detail-item"><div className="detail-label">Type</div><div className="detail-value">{formData.vehicle_type}</div></div>
               <div className="detail-item"><div className="detail-label">Max Load Capacity</div><div className="detail-value">{formData.max_load_capacity}</div></div>
               <div className="detail-item"><div className="detail-label">Odometer</div><div className="detail-value">{formData.odometer}</div></div>
-              <div className="detail-item"><div className="detail-label">Acquisition Cost</div><div className="detail-value">${formData.acquisition_cost}</div></div>
+              <div className="detail-item"><div className="detail-label">Acquisition Cost</div><div className="detail-value">₹{formData.acquisition_cost}</div></div>
               <div className="detail-item"><div className="detail-label">Purchase Date</div><div className="detail-value">{formData.acquisition_date || 'N/A'}</div></div>
             </div>
             <div className="form-actions">

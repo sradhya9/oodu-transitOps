@@ -279,7 +279,7 @@ const Expenses = () => {
                       {exp.expense_type}
                     </span>
                   </td>
-                  <td>${exp.amount.toFixed(2)}</td>
+                  <td>₹{exp.amount.toFixed(2)}</td>
                   <td>{exp.expense_date}</td>
                   <td>{exp.vehicle_id !== null ? exp.vehicle_id : <span style={{ color: '#9CA3AF' }}>—</span>}</td>
                   <td>{exp.trip_id !== null ? exp.trip_id : <span style={{ color: '#9CA3AF' }}>—</span>}</td>
@@ -331,7 +331,7 @@ const Expenses = () => {
                 </div>
 
                 <div className="form-group">
-                  <label className="form-label">Amount ($) *</label>
+                  <label className="form-label">Amount (₹) *</label>
                   <input
                     type="text"
                     name="amount"

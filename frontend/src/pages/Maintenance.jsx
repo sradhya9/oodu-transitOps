@@ -282,7 +282,7 @@ const Maintenance = () => {
                   <td>{log.workshop || <span style={{color: '#9CA3AF'}}>—</span>}</td>
                   <td>{log.start_date}</td>
                   <td>{log.end_date || <span style={{color: '#9CA3AF'}}>—</span>}</td>
-                  <td>{log.maintenance_cost !== null ? `$${log.maintenance_cost.toFixed(2)}` : <span style={{color: '#9CA3AF'}}>—</span>}</td>
+                  <td>{log.maintenance_cost !== null ? `₹${log.maintenance_cost.toFixed(2)}` : <span style={{color: '#9CA3AF'}}>—</span>}</td>
                   <td>
                     <span className={`status-badge ${log.status.toLowerCase()}`}>
                       {log.status}
@@ -360,7 +360,7 @@ const Maintenance = () => {
                 </div>
                 
                 <div className="form-group">
-                  <label className="form-label">Cost ($)</label>
+                  <label className="form-label">Cost (₹)</label>
                   <input 
                     type="text" 
                     name="maintenance_cost"
