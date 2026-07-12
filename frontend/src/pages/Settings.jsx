@@ -53,29 +53,29 @@ const Settings = () => {
           </div>
           
           {error && (
-            <div style={{ backgroundColor: '#FEF2F2', color: '#B91C1C', padding: '12px', borderRadius: '8px', marginBottom: '16px' }}>
+            <div style={{ backgroundColor: 'rgba(255, 91, 4, 0.1)', color: 'var(--c-kimchi)', padding: '12px', borderRadius: '8px', marginBottom: '16px', border: '1px solid rgba(255, 91, 4, 0.2)' }}>
               {error}
             </div>
           )}
 
           {approvedCode && (
-            <div style={{ backgroundColor: '#ECFDF5', border: '1px solid #10B981', padding: '16px', borderRadius: '8px', marginBottom: '24px' }}>
-              <h3 style={{ color: '#047857', marginTop: 0, marginBottom: '8px', display: 'flex', alignItems: 'center', gap: '8px' }}>
-                <CheckCircle size={20} /> Request Approved
+            <div style={{ backgroundColor: 'rgba(7, 80, 86, 0.05)', border: '1px solid var(--c-deep-sea)', padding: '20px', borderRadius: '12px', marginBottom: '24px', boxShadow: 'var(--shadow-sm)' }}>
+              <h3 style={{ color: 'var(--c-deep-sea)', marginTop: 0, marginBottom: '12px', display: 'flex', alignItems: 'center', gap: '8px', fontSize: '1.1rem' }}>
+                <CheckCircle size={22} /> Request Approved
               </h3>
-              <p style={{ margin: '0 0 12px 0', fontSize: '0.95rem' }}>
-                You have approved the reset for <strong>{approvedCode.email}</strong>. 
+              <p style={{ margin: '0 0 16px 0', fontSize: '0.95rem', color: 'var(--text-secondary)', lineHeight: '1.5' }}>
+                You have approved the reset for <strong style={{ color: 'var(--text-primary)' }}>{approvedCode.email}</strong>. 
                 Please securely provide them with this <strong>Special Access Code</strong>. 
                 (The emailed code would be sent automatically in production).
               </p>
               <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px' }}>
-                <div style={{ backgroundColor: 'white', padding: '12px', borderRadius: '4px', border: '1px solid #D1D5DB' }}>
-                  <span style={{ display: 'block', fontSize: '0.75rem', color: '#6B7280', textTransform: 'uppercase', marginBottom: '4px' }}>Special Access Code (Give to user)</span>
-                  <strong style={{ fontFamily: 'monospace', fontSize: '1.2rem', letterSpacing: '1px' }}>{approvedCode.special}</strong>
+                <div style={{ backgroundColor: 'var(--bg-card)', padding: '16px', borderRadius: '8px', border: '1px solid var(--border-color)', boxShadow: 'var(--shadow-sm)' }}>
+                  <span style={{ display: 'block', fontSize: '0.75rem', color: 'var(--text-muted)', textTransform: 'uppercase', marginBottom: '6px', fontWeight: '600', letterSpacing: '0.5px' }}>Special Access Code (Give to user)</span>
+                  <strong style={{ fontFamily: 'monospace', fontSize: '1.4rem', letterSpacing: '2px', color: 'var(--c-midnight-blue)' }}>{approvedCode.special}</strong>
                 </div>
-                <div style={{ backgroundColor: 'white', padding: '12px', borderRadius: '4px', border: '1px solid #D1D5DB' }}>
-                  <span style={{ display: 'block', fontSize: '0.75rem', color: '#6B7280', textTransform: 'uppercase', marginBottom: '4px' }}>Emailed Code (Simulation)</span>
-                  <strong style={{ fontFamily: 'monospace', fontSize: '1.2rem', letterSpacing: '1px' }}>{approvedCode.emailed}</strong>
+                <div style={{ backgroundColor: 'var(--bg-card)', padding: '16px', borderRadius: '8px', border: '1px solid var(--border-color)', boxShadow: 'var(--shadow-sm)' }}>
+                  <span style={{ display: 'block', fontSize: '0.75rem', color: 'var(--text-muted)', textTransform: 'uppercase', marginBottom: '6px', fontWeight: '600', letterSpacing: '0.5px' }}>Emailed Code (Simulation)</span>
+                  <strong style={{ fontFamily: 'monospace', fontSize: '1.4rem', letterSpacing: '2px', color: 'var(--c-midnight-blue)' }}>{approvedCode.emailed}</strong>
                 </div>
               </div>
             </div>

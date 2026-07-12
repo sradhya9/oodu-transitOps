@@ -43,22 +43,27 @@
 }
 
 .kpi-card {
-  background-color: var(--bg-main, #ffffff);
-  border: 1px solid var(--card-border, #e2e8f0);
-  border-radius: 6px;
-  padding: 16px 20px;
+  background-color: var(--bg-card);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-card);
+  padding: 24px;
   display: flex;
   flex-direction: column;
-  gap: 8px;
-  border-left: 4px solid var(--border-color, #cbd5e1);
-  box-shadow: 0 1px 2px rgba(0,0,0,0.02);
+  gap: 12px;
+  box-shadow: var(--shadow-apple);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
 }
 
-.kpi-card.total { border-left-color: #64748B; }
-.kpi-card.available { border-left-color: #10B981; }
-.kpi-card.on-trip { border-left-color: #3B82F6; }
-.kpi-card.in-shop { border-left-color: #F59E0B; }
-.kpi-card.retired { border-left-color: #EF4444; }
+.kpi-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 16px 40px -12px rgba(0, 0, 0, 0.15);
+}
+
+.kpi-card.total { border-bottom: 4px solid #64748B; }
+.kpi-card.available { border-bottom: 4px solid #10B981; }
+.kpi-card.on-trip { border-bottom: 4px solid #3B82F6; }
+.kpi-card.in-shop { border-bottom: 4px solid #F59E0B; }
+.kpi-card.retired { border-bottom: 4px solid #EF4444; }
 
 .controls-row {
   display: flex;
@@ -66,10 +71,11 @@
   align-items: center;
   flex-wrap: wrap;
   gap: 16px;
-  background-color: var(--bg-main, #ffffff);
-  padding: 16px;
-  border: 1px solid var(--card-border, #e2e8f0);
-  border-radius: 6px;
+  background-color: var(--bg-card);
+  padding: 20px 24px;
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-card);
+  box-shadow: var(--shadow-sm);
 }
 
 .filters-group {
@@ -79,26 +85,44 @@
 }
 
 .search-input {
-  padding: 8px 12px;
-  border: 1px solid var(--card-border, #e2e8f0);
-  border-radius: 4px;
-  font-size: 0.9rem;
-  width: 250px;
+  padding: 10px 16px;
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-btn);
+  font-size: 0.95rem;
+  width: 280px;
+  background-color: var(--bg-card);
+  color: var(--text-dark);
+  outline: none;
+  transition: all 0.2s ease;
+  box-shadow: var(--shadow-sm);
+}
+.search-input:focus {
+  border-color: var(--accent-color);
+  box-shadow: 0 0 0 3px rgba(255, 91, 4, 0.15);
 }
 
 .filter-select {
-  padding: 8px 12px;
-  border: 1px solid var(--card-border, #e2e8f0);
-  border-radius: 4px;
-  font-size: 0.9rem;
-  background-color: white;
+  padding: 10px 16px;
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-btn);
+  font-size: 0.95rem;
+  background-color: var(--bg-card);
+  color: var(--text-dark);
+  outline: none;
+  transition: all 0.2s ease;
+  box-shadow: var(--shadow-sm);
+}
+.filter-select:focus {
+  border-color: var(--accent-color);
+  box-shadow: 0 0 0 3px rgba(255, 91, 4, 0.15);
 }
 
 .data-table-container {
-  background-color: var(--bg-main, #ffffff);
-  border: 1px solid var(--card-border, #e2e8f0);
-  border-radius: 6px;
+  background-color: var(--bg-card);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-card);
   overflow-x: auto;
+  box-shadow: var(--shadow-sm);
 }
 
 .data-table {
@@ -107,14 +131,14 @@
 }
 
 .data-table th, .data-table td {
-  padding: 16px;
+  padding: 20px 24px;
   text-align: left;
-  border-bottom: 1px solid var(--card-border, #e2e8f0);
+  border-bottom: 1px solid var(--border-color);
 }
 
 .data-table th {
   font-size: 0.8rem;
-  color: var(--text-muted, #64748b);
+  color: var(--text-muted);
   text-transform: uppercase;
   font-weight: 600;
   cursor: pointer;
@@ -122,7 +146,7 @@
 }
 
 .data-table th:hover {
-  color: var(--text-dark, #1e293b);
+  color: var(--text-primary);
 }
 
 .data-table th .sort-indicator {
@@ -131,22 +155,25 @@
 }
 
 .data-table td {
-  font-size: 0.9rem;
-  color: var(--text-dark, #1e293b);
+  font-size: 0.95rem;
+  color: var(--text-dark);
 }
 
 .status-badge {
-  display: inline-block;
-  padding: 4px 10px;
-  border-radius: 12px;
-  font-size: 0.75rem;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 6px 14px;
+  border-radius: 20px;
+  font-size: 0.8rem;
   font-weight: 600;
+  letter-spacing: 0.5px;
 }
 
-.status-badge.available { background-color: #d1fae5; color: #065f46; }
-.status-badge.on-trip { background-color: #dbeafe; color: #1e40af; }
-.status-badge.in-shop { background-color: #fef3c7; color: #92400e; }
-.status-badge.retired { background-color: #fee2e2; color: #991b1b; }
+.status-badge.available { background-color: rgba(16, 185, 129, 0.15); color: #10B981; }
+.status-badge.on-trip { background-color: rgba(59, 130, 246, 0.15); color: #3B82F6; }
+.status-badge.in-shop { background-color: rgba(245, 158, 11, 0.15); color: #F59E0B; }
+.status-badge.retired { background-color: rgba(239, 68, 68, 0.15); color: #EF4444; }
 
 .actions-cell {
   display: flex;
@@ -174,9 +201,9 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 16px;
-  background-color: var(--bg-main, #ffffff);
-  border-top: 1px solid var(--card-border, #e2e8f0);
+  padding: 20px 24px;
+  background-color: var(--bg-card);
+  border-top: 1px solid var(--border-color);
 }
 
 .pagination-controls {
@@ -223,23 +250,32 @@
 .form-group label {
   display: block;
   font-size: 0.9rem;
-  font-weight: 500;
-  margin-bottom: 6px;
-  color: var(--text-dark, #1e293b);
+  font-weight: 600;
+  margin-bottom: 8px;
+  color: var(--text-dark);
 }
 
 .form-control {
   width: 100%;
-  padding: 8px 12px;
-  border: 1px solid var(--card-border, #e2e8f0);
-  border-radius: 4px;
+  padding: 10px 16px;
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-btn);
   font-size: 0.95rem;
+  background-color: var(--bg-main);
+  color: var(--text-dark);
   box-sizing: border-box;
+  outline: none;
+  transition: all 0.2s ease;
+  box-shadow: var(--shadow-sm);
+}
+.form-control:focus {
+  border-color: var(--accent-color);
+  box-shadow: 0 0 0 3px rgba(255, 91, 4, 0.15);
 }
 
 .form-control:disabled {
-  background-color: #f1f5f9;
-  color: #94a3b8;
+  background-color: var(--border-color);
+  color: var(--text-muted);
   cursor: not-allowed;
 }
 

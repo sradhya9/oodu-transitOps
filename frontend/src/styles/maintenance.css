@@ -90,14 +90,14 @@
 }
 
 .modal-container {
-  background-color: white;
-  border-radius: 8px;
+  background-color: var(--bg-card);
+  border-radius: var(--radius-card);
   width: 500px;
   max-width: 90%;
   max-height: 90vh;
   overflow-y: auto;
-  padding: 24px;
-  box-shadow: 0 10px 15px -3px rgba(0,0,0,0.1), 0 4px 6px -2px rgba(0,0,0,0.05);
+  padding: 32px;
+  box-shadow: var(--shadow-apple);
 }
 
 .modal-header {
@@ -137,19 +137,21 @@
 }
 
 .form-input, .form-textarea, .form-select {
-  padding: 8px 12px;
+  padding: 10px 16px;
   border: 1px solid var(--border-color);
-  border-radius: 6px;
+  border-radius: var(--radius-btn);
   font-family: inherit;
-  font-size: 0.9rem;
+  font-size: 0.95rem;
   color: var(--text-dark);
   outline: none;
-  background-color: white;
+  background-color: var(--bg-main);
+  transition: all 0.2s ease;
+  box-shadow: var(--shadow-sm);
 }
 
 .form-input:focus, .form-textarea:focus, .form-select:focus {
   border-color: var(--accent-color);
-  box-shadow: 0 0 0 3px rgba(255, 91, 4, 0.1);
+  box-shadow: 0 0 0 3px rgba(255, 91, 4, 0.15);
 }
 
 .form-row {
@@ -247,11 +249,11 @@
 }
 
 .report-section-card {
-  background-color: var(--bg-main);
-  border: 1px solid var(--card-border);
-  border-radius: 8px;
-  padding: 24px;
-  box-shadow: 0 1px 3px rgba(0,0,0,0.02);
+  background-color: var(--bg-card);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-card);
+  padding: 32px;
+  box-shadow: var(--shadow-apple);
   display: flex;
   flex-direction: column;
   gap: 16px;

@@ -36,14 +36,14 @@ const MainLayout = () => {
 
   // Define all links with required roles
   const allNavLinks = [
-    { path: '/dashboard', label: 'Dashboard', icon: <LayoutDashboard size={18} strokeWidth={2.2} />, roles: ['Fleet Manager', 'Dispatcher', 'Safety Officer', 'Financial Analyst'] },
-    { path: '/vehicles', label: 'Fleet', icon: <Truck size={18} strokeWidth={2.2} />, roles: ['Fleet Manager'] },
-    { path: '/drivers', label: 'Drivers', icon: <Users size={18} strokeWidth={2.2} />, roles: ['Fleet Manager', 'Safety Officer'] },
-    { path: '/trips', label: 'Trips', icon: <Route size={18} strokeWidth={2.2} />, roles: ['Fleet Manager', 'Dispatcher'] },
-    { path: '/maintenance', label: 'Maintenance', icon: <Wrench size={18} strokeWidth={2.2} />, roles: ['Fleet Manager'] },
-    { path: '/fuel-logs', label: 'Expenses', icon: <Droplet size={18} strokeWidth={2.2} />, roles: ['Fleet Manager', 'Financial Analyst'] },
-    { path: '/reports', label: 'Reports', icon: <PieChart size={18} strokeWidth={2.2} />, roles: ['Fleet Manager', 'Safety Officer', 'Financial Analyst'] },
-    { path: '/settings', label: 'Settings', icon: <Settings size={18} strokeWidth={2.2} />, roles: ['Fleet Manager'] }
+    { path: '/dashboard', label: 'Dashboard', icon: <LayoutDashboard size={18} strokeWidth={1.5} />, roles: ['Fleet Manager', 'Dispatcher', 'Safety Officer', 'Financial Analyst'] },
+    { path: '/vehicles', label: 'Fleet', icon: <Truck size={18} strokeWidth={1.5} />, roles: ['Fleet Manager'] },
+    { path: '/drivers', label: 'Drivers', icon: <Users size={18} strokeWidth={1.5} />, roles: ['Fleet Manager', 'Safety Officer'] },
+    { path: '/trips', label: 'Trips', icon: <Route size={18} strokeWidth={1.5} />, roles: ['Fleet Manager', 'Dispatcher'] },
+    { path: '/maintenance', label: 'Maintenance', icon: <Wrench size={18} strokeWidth={1.5} />, roles: ['Fleet Manager'] },
+    { path: '/fuel-logs', label: 'Expenses', icon: <Droplet size={18} strokeWidth={1.5} />, roles: ['Fleet Manager', 'Financial Analyst'] },
+    { path: '/reports', label: 'Reports', icon: <PieChart size={18} strokeWidth={1.5} />, roles: ['Fleet Manager', 'Safety Officer', 'Financial Analyst'] },
+    { path: '/settings', label: 'Settings', icon: <Settings size={18} strokeWidth={1.5} />, roles: ['Fleet Manager'] }
   ];
 
   // Filter links based on current user role
@@ -83,10 +83,10 @@ const MainLayout = () => {
         <header className="topbar">
           <div className="search-container">
             <button className="menu-toggle" onClick={toggleSidebar}>
-              <Menu size={24} />
+              <Menu size={24} strokeWidth={1.5} />
             </button>
             <div className="search-wrapper">
-              <Search size={16} className="search-icon" />
+              <Search size={16} strokeWidth={1.5} className="search-icon" />
               <input 
                 type="text" 
                 className="search-input" 
@@ -97,7 +97,7 @@ const MainLayout = () => {
           
           <div className="topbar-right">
             <button onClick={toggleTheme} className="theme-toggle-btn" aria-label="Toggle Theme">
-              {theme === 'light' ? <Moon size={20} /> : <Sun size={20} />}
+              {theme === 'light' ? <Moon size={18} strokeWidth={1.5} /> : <Sun size={18} strokeWidth={1.5} />}
             </button>
             <div className="user-profile">
               <div className="user-info">
@@ -112,9 +112,9 @@ const MainLayout = () => {
               onClick={handleLogout} 
               className="theme-toggle-btn" 
               aria-label="Logout" 
-              style={{ marginLeft: '12px' }}
+              style={{ marginLeft: '8px' }}
             >
-              <LogOut size={20} />
+              <LogOut size={18} strokeWidth={1.5} />
             </button>
           </div>
         </header>

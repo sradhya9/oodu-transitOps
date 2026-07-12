@@ -25,14 +25,21 @@
 }
 
 .filter-select {
-  padding: 8px 12px;
+  padding: 10px 16px;
   border: 1px solid var(--border-color);
-  border-radius: 6px;
-  background-color: var(--bg-main);
+  border-radius: var(--radius-btn);
+  background-color: var(--bg-card);
   color: var(--text-dark);
-  font-size: 0.85rem;
+  font-size: 0.9rem;
   min-width: 160px;
   outline: none;
+  transition: all 0.2s ease;
+  box-shadow: var(--shadow-sm);
+}
+
+.filter-select:focus {
+  border-color: var(--accent-color);
+  box-shadow: 0 0 0 3px rgba(255, 91, 4, 0.15);
 }
 
 .kpi-grid {
@@ -42,20 +49,25 @@
 }
 
 .kpi-card {
-  background-color: var(--bg-main);
+  background-color: var(--bg-card);
   border: 1px solid var(--card-border);
-  border-radius: 4px;
-  padding: 16px 20px;
+  border-radius: var(--radius-card);
+  padding: 24px;
   display: flex;
   flex-direction: column;
-  gap: 8px;
-  border-left: 4px solid var(--border-color);
-  box-shadow: 0 1px 2px rgba(0,0,0,0.02);
+  gap: 12px;
+  box-shadow: var(--shadow-apple);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
 }
 
-.kpi-card.blue { border-left-color: #3B82F6; }
-.kpi-card.green { border-left-color: #10B981; }
-.kpi-card.orange { border-left-color: #FF5B04; }
+.kpi-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 16px 40px -12px rgba(0, 0, 0, 0.15);
+}
+
+.kpi-card.blue { border-bottom: 4px solid #3B82F6; }
+.kpi-card.green { border-bottom: 4px solid #10B981; }
+.kpi-card.orange { border-bottom: 4px solid var(--accent-color); }
 
 .kpi-label {
   font-size: 0.75rem;
@@ -99,30 +111,32 @@
   text-transform: uppercase;
   letter-spacing: 0.5px;
   font-weight: 600;
-  padding-bottom: 12px;
+  padding-bottom: 16px;
   border-bottom: 1px solid var(--border-color);
 }
 
 .trips-table td {
-  padding: 16px 0;
-  font-size: 0.9rem;
+  padding: 20px 0;
+  font-size: 0.95rem;
   color: var(--text-dark);
   border-bottom: 1px solid var(--card-border);
 }
 
 .status-badge {
-  display: inline-block;
-  padding: 4px 12px;
-  border-radius: 4px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 6px 14px;
+  border-radius: 20px;
   font-size: 0.8rem;
-  font-weight: 500;
-  color: white;
+  font-weight: 600;
+  letter-spacing: 0.5px;
 }
 
-.status-badge.on-trip { background-color: #3B82F6; }
-.status-badge.completed { background-color: #84CC16; }
-.status-badge.dispatched { background-color: #3B82F6; }
-.status-badge.draft { background-color: #9CA3AF; }
+.status-badge.on-trip { background-color: rgba(59, 130, 246, 0.15); color: #3B82F6; }
+.status-badge.completed { background-color: rgba(16, 185, 129, 0.15); color: #10B981; }
+.status-badge.dispatched { background-color: rgba(59, 130, 246, 0.15); color: #3B82F6; }
+.status-badge.draft { background-color: rgba(156, 163, 175, 0.15); color: var(--text-muted); }
 
 /* Status Bars */
 .status-list {
@@ -164,10 +178,11 @@
 /* API Health Check box */
 .health-status-box {
   margin-top: 40px;
-  padding: 16px;
-  border: 1px solid var(--card-border);
-  border-radius: 6px;
-  background-color: #f8fafc;
+  padding: 24px;
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-card);
+  background-color: var(--bg-card);
+  box-shadow: var(--shadow-sm);
 }
 
 .health-status-box h3 {
