@@ -272,7 +272,7 @@ const Expenses = () => {
                 <th>Expense Type</th>
                 <th>Amount</th>
                 <th>Date</th>
-                <th>Vehicle ID</th>
+                <th>Vehicle</th>
                 <th>Trip ID</th>
                 <th>Description</th>
                 {canEdit && <th>Actions</th>}
@@ -289,7 +289,7 @@ const Expenses = () => {
                   </td>
                   <td>₹{exp.amount.toFixed(2)}</td>
                   <td>{exp.expense_date}</td>
-                  <td>{exp.vehicle_id !== null ? exp.vehicle_id : <span style={{ color: '#9CA3AF' }}>—</span>}</td>
+                  <td>{exp.vehicle_reg_number ? exp.vehicle_reg_number : (exp.vehicle_id !== null ? `#${exp.vehicle_id}` : <span style={{ color: '#9CA3AF' }}>—</span>)}</td>
                   <td>{exp.trip_id !== null ? exp.trip_id : <span style={{ color: '#9CA3AF' }}>—</span>}</td>
                   <td style={{ maxWidth: '200px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }} title={exp.description}>
                     {exp.description || <span style={{ color: '#9CA3AF' }}>—</span>}

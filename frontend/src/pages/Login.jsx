@@ -24,8 +24,23 @@ const Login = () => {
     setError('');
     setSuccess('');
 
-    if (!email || !password) {
-      setError('Email and password are required.');
+    if (!email && !password) {
+      setError('Please enter your email and password.');
+      return;
+    }
+    if (!email) {
+      setError('Please enter your email address.');
+      return;
+    }
+    if (!password) {
+      setError('Please enter your password.');
+      return;
+    }
+    
+    // Basic email regex
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(email)) {
+      setError('Please enter a valid email address.');
       return;
     }
 
@@ -50,6 +65,12 @@ const Login = () => {
       return;
     }
 
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(email)) {
+      setError('Please enter a valid email address.');
+      return;
+    }
+
     setLoading(true);
     try {
       const response = await api.post('/api/auth/forgot-password', { email });
@@ -68,8 +89,34 @@ const Login = () => {
     setError('');
     setSuccess('');
 
-    if (!email || !specialCode || !emailedCode || !password) {
-      setError('All fields are required.');
+    if (!email && !specialCode && !emailedCode && !password) {
+      setError('All fields are required to reset your password.');
+      return;
+    }
+
+    if (!email) {
+      setError('Email is required.');
+      return;
+    }
+
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(email)) {
+      setError('Please enter a valid email address.');
+      return;
+    }
+
+    if (!specialCode || !emailedCode) {
+      setError('Please enter the access codes provided to you.');
+      return;
+    }
+
+    if (!password) {
+      setError('Please enter a new password.');
+      return;
+    }
+    
+    if (password.length < 6) {
+      setError('Password must be at least 6 characters long.');
       return;
     }
 
@@ -138,6 +185,16 @@ const Login = () => {
           <p style={{ color: '#9CA3AF', fontSize: '1.05rem', margin: 0 }}>
             Smart Transport Operations Platform
           </p>
+        </div>
+
+        {/* Center GIF */}
+        <div style={{ zIndex: 1, display: 'flex', flex: 1, alignItems: 'center', justifyContent: 'center' }}>
+          <img 
+            src="/login-animation.gif" 
+            alt="TransitOps Animation" 
+            style={{ maxWidth: '80%', maxHeight: '100%', objectFit: 'contain' }} 
+            loop 
+          />
         </div>
 
         {/*<div style={{ zIndex: 1 }}>

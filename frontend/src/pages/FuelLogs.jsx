@@ -286,7 +286,7 @@ const FuelLogs = () => {
                 <thead>
                   <tr>
                     <th>Log ID</th>
-                    <th>Vehicle ID</th>
+                    <th>Vehicle</th>
                     <th>Trip ID</th>
                     <th>Liters</th>
                     <th>Fuel Cost</th>
@@ -299,7 +299,7 @@ const FuelLogs = () => {
                   {filteredLogs.map((log) => (
                     <tr key={log.id}>
                       <td>#{log.id}</td>
-                      <td>{log.vehicle_id}</td>
+                      <td>{log.vehicle_reg_number ? log.vehicle_reg_number : (log.vehicle_id !== null ? `#${log.vehicle_id}` : <span style={{ color: '#9CA3AF' }}>—</span>)}</td>
                       <td>{log.trip_id !== null ? log.trip_id : <span style={{ color: '#9CA3AF' }}>—</span>}</td>
                       <td>{log.liters.toFixed(2)} L</td>
                       <td>₹{log.fuel_cost.toFixed(2)}</td>

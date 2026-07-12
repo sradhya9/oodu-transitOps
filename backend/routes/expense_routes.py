@@ -12,6 +12,7 @@ def serialize_expense(expense):
     return {
         "id": expense.id,
         "vehicle_id": expense.vehicle_id,
+        "vehicle_reg_number": expense.vehicle.registration_number if expense.vehicle else None,
         "trip_id": expense.trip_id,
         "expense_type": expense.expense_type,
         "amount": float(expense.amount) if expense.amount is not None else None,
@@ -32,7 +33,7 @@ def parse_date(date_str):
 # GET /expenses - Return all expense records
 @expense_bp.route('', methods=['GET'])
 @authenticate()
-@authorize(roles=['Financial Analyst'])
+@authorize(roles=['Financial Analyst', 'Driver'])
 def get_all_expenses():
     try:
         user = g.current_user
@@ -61,7 +62,7 @@ def get_expense(log_id):
 # POST /expenses - Create a new expense record
 @expense_bp.route('', methods=['POST'])
 @authenticate()
-@authorize(roles=['Financial Analyst'])
+@authorize(roles=['Financial Analyst', 'Driver'])
 def create_expense():
     data = request.get_json() or {}
     errors = {}

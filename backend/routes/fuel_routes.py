@@ -10,6 +10,7 @@ def serialize_fuel(log):
     return {
         "id": log.id,
         "vehicle_id": log.vehicle_id,
+        "vehicle_reg_number": log.vehicle.registration_number if log.vehicle else None,
         "trip_id": log.trip_id,
         "liters": float(log.liters) if log.liters is not None else None,
         "fuel_cost": float(log.fuel_cost) if log.fuel_cost is not None else None,
