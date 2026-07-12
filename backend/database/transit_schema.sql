@@ -392,3 +392,24 @@ ON expenses(vehicle_id);
 
 -- Vehicle ROI
 -- = (Revenue - (Maintenance + Fuel)) / Acquisition Cost
+
+-- --------------------------------------------------------
+-- Table structure for table `system_settings`
+-- --------------------------------------------------------
+CREATE TABLE IF NOT EXISTS `system_settings` (
+  `id` INT AUTO_INCREMENT PRIMARY KEY,
+  `setting_key` VARCHAR(100) NOT NULL UNIQUE,
+  `setting_value` VARCHAR(255) NOT NULL,
+  `description` VARCHAR(255) DEFAULT NULL,
+  `updated_at` DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+);
+
+-- Seed Initial Data for `system_settings`
+INSERT IGNORE INTO `system_settings` (`setting_key`, `setting_value`, `description`) VALUES
+('rate_per_km_truck', '80', 'Rate per KM for Trucks'),
+('rate_per_km_mini_truck', '50', 'Rate per KM for Mini Trucks'),
+('rate_per_km_van', '40', 'Rate per KM for Vans'),
+('rate_per_km_pickup', '45', 'Rate per KM for Pickups'),
+('rate_per_km_bike', '15', 'Rate per KM for Bikes'),
+('rate_per_km_trailer', '120', 'Rate per KM for Trailers'),
+('rate_per_km_container', '150', 'Rate per KM for Containers');
