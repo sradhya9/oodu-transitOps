@@ -33,11 +33,14 @@ def create_app(config_class=Config):
     app.register_blueprint(report_bp)
 
     from backend.routes.vehicle_routes import vehicle_bp
-    app.register_blueprint(vehicle_bp)
-    app.register_blueprint(driver_bp)
-    app.register_blueprint(trip_bp)
-    app.register_blueprint(dashboard_bp)
+    from backend.routes.settings_routes import settings_bp
+
+    app.register_blueprint(vehicle_bp, url_prefix='/api/vehicles')
+    app.register_blueprint(driver_bp, url_prefix='/api/drivers')
+    app.register_blueprint(trip_bp, url_prefix='/api/trips')
+    app.register_blueprint(dashboard_bp, url_prefix='/api/dashboard')
     app.register_blueprint(auth_bp, url_prefix='/api/auth')
+    app.register_blueprint(settings_bp, url_prefix='/api/settings')
 
     # Test database connection on startup
     with app.app_context():

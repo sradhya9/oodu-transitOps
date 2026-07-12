@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import api from '../services/api';
-import { Key, CheckCircle, XCircle } from 'lucide-react';
+import { getSystemSettings, updateSystemSettings } from '../services/settingsService';
+import { Key, CheckCircle, XCircle, Settings as SettingsIcon, Save } from 'lucide-react';
 import '../styles/dashboard.css';
 
 const Settings = () => {
@@ -8,9 +9,14 @@ const Settings = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
   const [approvedCode, setApprovedCode] = useState(null);
+  
+  const [sysSettings, setSysSettings] = useState({});
+  const [sysSettingsLoading, setSysSettingsLoading] = useState(true);
+  const [saveSuccess, setSaveSuccess] = useState(false);
 
   useEffect(() => {
     fetchResetRequests();
+    fetchSystemSettings();
   }, []);
 
   const fetchResetRequests = async () => {
@@ -21,6 +27,39 @@ const Settings = () => {
       setError('Failed to fetch password reset requests.');
     } finally {
       setLoading(false);
+    }
+  };
+
+  const fetchSystemSettings = async () => {
+    try {
+      const data = await getSystemSettings();
+      setSysSettings(data);
+    } catch (err) {
+      console.error('Failed to fetch system settings:', err);
+    } finally {
+      setSysSettingsLoading(false);
+    }
+  };
+
+  const handleSettingChange = (key, value) => {
+    setSysSettings(prev => ({
+      ...prev,
+      [key]: { ...prev[key], value }
+    }));
+    setSaveSuccess(false);
+  };
+
+  const handleSaveSettings = async () => {
+    try {
+      const payload = {};
+      Object.keys(sysSettings).forEach(key => {
+        payload[key] = sysSettings[key].value;
+      });
+      await updateSystemSettings(payload);
+      setSaveSuccess(true);
+      setTimeout(() => setSaveSuccess(false), 3000);
+    } catch (err) {
+      console.error('Failed to update system settings:', err);
     }
   };
 
@@ -120,6 +159,57 @@ const Settings = () => {
                 )}
               </tbody>
             </table>
+          )}
+        </div>
+
+        {/* System Settings Section */}
+        <div className="recent-trips-section" style={{ marginTop: '24px' }}>
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '20px' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+              <SettingsIcon size={24} color="var(--c-midnight-blue)" />
+              <h2 className="section-title" style={{ margin: 0 }}>System Configuration</h2>
+            </div>
+            <button 
+              className="btn-primary" 
+              onClick={handleSaveSettings}
+              style={{ display: 'flex', alignItems: 'center', gap: '8px', padding: '8px 16px' }}
+            >
+              <Save size={18} /> Save Settings
+            </button>
+          </div>
+
+          {saveSuccess && (
+            <div style={{ backgroundColor: 'rgba(7, 80, 86, 0.1)', color: 'var(--c-deep-sea)', padding: '12px', borderRadius: '8px', marginBottom: '16px', border: '1px solid rgba(7, 80, 86, 0.2)' }}>
+              Settings saved successfully!
+            </div>
+          )}
+
+          {sysSettingsLoading ? (
+            <p>Loading settings...</p>
+          ) : (
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(300px, 1fr))', gap: '20px' }}>
+              {Object.keys(sysSettings).map((key) => (
+                <div key={key} style={{ backgroundColor: 'var(--bg-card)', padding: '16px', borderRadius: '8px', border: '1px solid var(--card-border)', boxShadow: 'var(--shadow-sm)' }}>
+                  <label style={{ display: 'block', fontSize: '0.9rem', fontWeight: 'bold', color: 'var(--text-dark)', marginBottom: '8px' }}>
+                    {sysSettings[key].description || key}
+                  </label>
+                  <input 
+                    type="text" 
+                    value={sysSettings[key].value} 
+                    onChange={(e) => handleSettingChange(key, e.target.value)}
+                    style={{ 
+                      width: '100%', 
+                      padding: '10px', 
+                      borderRadius: '6px', 
+                      border: '1px solid var(--border-color)',
+                      fontSize: '1rem',
+                      color: 'var(--text-primary)'
+                    }}
+                  />
+                  <span style={{ display: 'block', fontSize: '0.75rem', color: 'var(--text-muted)', marginTop: '8px', fontFamily: 'monospace' }}>Key: {key}</span>
+                </div>
+              ))}
+            </div>
           )}
         </div>
       </div>

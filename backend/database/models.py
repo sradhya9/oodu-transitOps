@@ -169,3 +169,11 @@ class PasswordResetRequest(db.Model):
     expires_at = db.Column(db.DateTime)
     
     user = db.relationship('User', backref=db.backref('password_resets', lazy=True))
+
+class SystemSetting(db.Model):
+    __tablename__ = 'system_settings'
+    id = db.Column(db.Integer, primary_key=True, autoincrement=True)
+    setting_key = db.Column(db.String(100), unique=True, nullable=False)
+    setting_value = db.Column(db.String(255), nullable=False)
+    description = db.Column(db.String(255))
+    updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
