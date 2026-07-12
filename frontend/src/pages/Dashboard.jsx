@@ -19,8 +19,16 @@ const Dashboard = () => {
     activeTrips: 0,
     pendingTrips: 0,
     driversOnDuty: 0,
-    fleetUtilization: 0
+    fleetUtilization: 0,
+    onTripVehicles: 0,
+    retiredVehicles: 0,
+    totalVehiclesAll: 0,
   });
+
+  const getWidth = (count) => {
+    if (!stats.totalVehiclesAll) return '0%';
+    return `${(count / stats.totalVehiclesAll) * 100}%`;
+  };
 
   const [recentTrips, setRecentTrips] = useState([]);
 
@@ -183,20 +191,20 @@ const Dashboard = () => {
             <h2 className="section-title">Vehicle Status</h2>
             <div className="status-list">
               <div className="status-item">
-                <span className="status-item-label">Available</span>
-                <div className="status-bar-bg"><div className="status-bar-fill green"></div></div>
+                <span className="status-item-label">Available ({stats.availableVehicles})</span>
+                <div className="status-bar-bg"><div className="status-bar-fill green" style={{ width: getWidth(stats.availableVehicles) }}></div></div>
               </div>
               <div className="status-item">
-                <span className="status-item-label">On Trip</span>
-                <div className="status-bar-bg"><div className="status-bar-fill blue"></div></div>
+                <span className="status-item-label">On Trip ({stats.onTripVehicles})</span>
+                <div className="status-bar-bg"><div className="status-bar-fill blue" style={{ width: getWidth(stats.onTripVehicles) }}></div></div>
               </div>
               <div className="status-item">
-                <span className="status-item-label">In Shop</span>
-                <div className="status-bar-bg"><div className="status-bar-fill orange"></div></div>
+                <span className="status-item-label">In Shop ({stats.maintenanceVehicles})</span>
+                <div className="status-bar-bg"><div className="status-bar-fill orange" style={{ width: getWidth(stats.maintenanceVehicles) }}></div></div>
               </div>
               <div className="status-item">
-                <span className="status-item-label">Retired</span>
-                <div className="status-bar-bg"><div className="status-bar-fill red"></div></div>
+                <span className="status-item-label">Retired ({stats.retiredVehicles})</span>
+                <div className="status-bar-bg"><div className="status-bar-fill red" style={{ width: getWidth(stats.retiredVehicles) }}></div></div>
               </div>
             </div>
           </div>
