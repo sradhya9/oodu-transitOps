@@ -8,7 +8,7 @@ trip_bp = Blueprint('trip', __name__, url_prefix='/api/trips')
 
 @trip_bp.route('', methods=['GET'])
 @authenticate()
-@authorize(roles=['Dispatcher', 'Safety Officer'])
+@authorize(roles=['Dispatcher', 'Safety Officer', 'Driver'])
 def get_trips():
     try:
         page = request.args.get('page', 1, type=int)
@@ -230,7 +230,7 @@ def dispatch_trip(id):
 
 @trip_bp.route('/<int:id>/complete', methods=['PUT'])
 @authenticate()
-@authorize(roles=['Dispatcher'])
+@authorize(roles=['Dispatcher', 'Driver'])
 def complete_trip(id):
     try:
         trip = Trip.query.get(id)

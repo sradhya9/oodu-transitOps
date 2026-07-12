@@ -10,7 +10,7 @@ load_dotenv(os.path.join(os.path.dirname(__file__), '.env'))
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 from backend import create_app
-from backend.database.models import db, Vehicle, Driver, Trip, User, Role, MaintenanceLog, FuelLog, Expense
+from backend.database.models import db, Vehicle, Driver, Trip, User, Role, MaintenanceLog, FuelLog, Expense, FleetGroup, DispatchGroup
 
 app = create_app()
 
@@ -22,7 +22,7 @@ def generate_mock_data():
         db.create_all()
 
         print("Creating Roles...")
-        roles = ['Fleet Manager', 'Dispatcher', 'Safety Officer', 'Financial Analyst']
+        roles = ['Fleet Manager', 'Dispatcher', 'Safety Officer', 'Financial Analyst', 'Driver']
         role_objs = {}
         for r_name in roles:
             role = Role(role_name=r_name)
@@ -56,6 +56,27 @@ def generate_mock_data():
         
         db.session.commit()
 
+        print("Creating Fleet & Dispatch Groups...")
+        # Get users by role
+        fm_users = [u for u in users if u.role_id == role_objs['Fleet Manager'].id]
+        dispatch_users = [u for u in users if u.role_id == role_objs['Dispatcher'].id]
+        finance_users = [u for u in users if u.role_id == role_objs['Financial Analyst'].id]
+
+        fleet_groups = []
+        for i, fm in enumerate(fm_users):
+            fg = FleetGroup(name=f"Division {['North', 'South', 'East', 'West'][i % 4]}", fleet_manager_id=fm.id)
+            db.session.add(fg)
+            fleet_groups.append(fg)
+        db.session.commit()
+
+        dispatch_groups = []
+        for i, dsp in enumerate(dispatch_users):
+            fg = random.choice(fleet_groups)
+            dg = DispatchGroup(name=f"Team {['Alpha', 'Bravo', 'Charlie', 'Delta', 'Echo'][i % 5]}", fleet_group_id=fg.id, dispatcher_id=dsp.id)
+            db.session.add(dg)
+            dispatch_groups.append(dg)
+        db.session.commit()
+
         print("Creating Vehicles...")
         vehicles = []
         
@@ -85,7 +106,8 @@ def generate_mock_data():
                 odometer=random.uniform(10000, 250000),
                 acquisition_cost=v_model['cost'] * random.uniform(0.8, 1.2),
                 acquisition_date=date.today() - timedelta(days=random.randint(300, 1500)),
-                status=random.choice(statuses)
+                status=random.choice(statuses),
+                dispatch_group_id=random.choice(dispatch_groups).id
             )
             db.session.add(v)
             vehicles.append(v)
@@ -94,15 +116,27 @@ def generate_mock_data():
         print("Creating Drivers...")
         drivers = []
         driver_statuses = ['Available', 'Available', 'On Trip', 'Off Duty']
+        driver_role = role_objs['Driver']
         
         driver_first_names = ["Karan", "Manish", "Sunil", "Rajiv", "Deepak", "Anil", "Suresh", "Manoj", "Ajay", "Vijay", "Mukesh", "Rakesh", "Ganesh", "Santosh", "Prakash", "Dinesh", "Naveen", "Ashok", "Sandeep", "Vinod", "Harish", "Pramod", "Nitin", "Yogesh", "Kamlesh"]
         driver_last_names = ["Singh", "Kumar", "Yadav", "Sharma", "Patel", "Mishra", "Chauhan", "Rajput", "Gupta", "Das"]
 
         for i in range(1, 26):
             full_name = f"{random.choice(driver_first_names)} {random.choice(driver_last_names)}"
+            
+            # Create a user for the driver
+            driver_user = User(
+                full_name=full_name,
+                email=f"driver{i}@transitops.in",
+                role_id=driver_role.id
+            )
+            driver_user.set_password('password123')
+            db.session.add(driver_user)
+            db.session.flush()
+            users.append(driver_user)
 
             d = Driver(
-                user_id=None,
+                user_id=driver_user.id,
                 full_name=full_name,
                 license_number=f"DL-{random.randint(10, 99)}{random.randint(100000000, 999999999)}",
                 license_category=random.choice(['HMV', 'LMV', 'TRANS']),
@@ -110,16 +144,14 @@ def generate_mock_data():
                 contact_number=f"+91 {random.randint(70000, 99999)}{random.randint(10000, 99999)}",
                 safety_score=random.uniform(70, 100),
                 joining_date=date.today() - timedelta(days=random.randint(50, 1000)),
-                status=random.choice(driver_statuses)
+                status=random.choice(driver_statuses),
+                dispatch_group_id=random.choice(dispatch_groups).id
             )
             db.session.add(d)
             drivers.append(d)
         db.session.commit()
 
         print("Creating Trips, Maintenance, Fuel, and Expenses...")
-        fm_users = [u for u in users if u.role_id == role_objs['Fleet Manager'].id]
-        dispatch_users = [u for u in users if u.role_id == role_objs['Dispatcher'].id]
-        finance_users = [u for u in users if u.role_id == role_objs['Financial Analyst'].id]
         
         cities = ['Mumbai, MH', 'Delhi, DL', 'Bengaluru, KA', 'Chennai, TN', 'Pune, MH', 'Hyderabad, TS', 'Ahmedabad, GJ', 'Kolkata, WB', 'Jaipur, RJ', 'Surat, GJ']
         
@@ -243,8 +275,7 @@ def generate_mock_data():
         
         finance_users = [u for u in users if u.role_id == role_objs['Financial Analyst'].id]
         print("Financial Analyst:", finance_users[0].email)
-        
-        print("Financial Analyst:", finance_users[0].email)
+        print("Driver:", f"driver1@transitops.in")
 
 if __name__ == '__main__':
     generate_mock_data()

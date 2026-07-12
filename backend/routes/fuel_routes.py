@@ -30,7 +30,7 @@ def parse_date(date_str):
 # GET /fuel-logs - Return all fuel records
 @fuel_bp.route('', methods=['GET'])
 @authenticate()
-@authorize(roles=['Financial Analyst'])
+@authorize(roles=['Financial Analyst', 'Driver'])
 def get_all_fuel_logs():
     try:
         user = g.current_user
@@ -59,7 +59,7 @@ def get_fuel(log_id):
 # POST /fuel-logs - Create a new fuel record
 @fuel_bp.route('', methods=['POST'])
 @authenticate()
-@authorize(roles=['Financial Analyst'])
+@authorize(roles=['Financial Analyst', 'Driver'])
 def create_fuel_log():
     data = request.get_json() or {}
     errors = {}

@@ -175,15 +175,22 @@ def create_driver():
         if data.get('joining_date'):
             joining_date = datetime.strptime(data['joining_date'], "%Y-%m-%d").date()
             
+        safety_score = float(data.get('safety_score') or 100.0)
+        status = data.get('status', 'Available')
+        
+        # Business rule: Automatically suspend drivers with low safety score
+        if safety_score < 50:
+            status = 'Suspended'
+            
         new_driver = Driver(
             full_name=data['full_name'],
             license_number=data['license_number'],
             license_category=data.get('license_category'),
             license_expiry=expiry_date,
             contact_number=data.get('contact_number'),
-            safety_score=float(data.get('safety_score') or 100.0),
+            safety_score=safety_score,
             joining_date=joining_date,
-            status=data.get('status', 'Available')
+            status=status
         )
         
         db.session.add(new_driver)
@@ -223,6 +230,13 @@ def update_driver(id):
         if 'safety_score' in data:
             driver.safety_score = float(data['safety_score'])
             
+        if 'status' in data:
+            driver.status = data['status']
+            
+        # Business rule: Automatically suspend drivers with low safety score
+        if driver.safety_score is not None and driver.safety_score < 50:
+            driver.status = 'Suspended'
+            
         if 'license_expiry' in data:
             expiry_str = data['license_expiry']
             if expiry_str:
@@ -237,8 +251,7 @@ def update_driver(id):
             else:
                 driver.joining_date = None
                 
-        if 'status' in data:
-            driver.status = data['status']
+        # Status already handled above (including business rule override)
             
         # Note: license_number is NOT updated as per business rules
         

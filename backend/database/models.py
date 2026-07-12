@@ -29,6 +29,26 @@ class User(db.Model):
     def check_password(self, password):
         return check_password_hash(self.password_hash, password)
 
+class FleetGroup(db.Model):
+    __tablename__ = 'fleet_groups'
+    id = db.Column(db.Integer, primary_key=True, autoincrement=True)
+    name = db.Column(db.String(100), nullable=False)
+    fleet_manager_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+
+    manager = db.relationship('User', backref=db.backref('managed_fleets', lazy=True))
+
+class DispatchGroup(db.Model):
+    __tablename__ = 'dispatch_groups'
+    id = db.Column(db.Integer, primary_key=True, autoincrement=True)
+    name = db.Column(db.String(100), nullable=False)
+    fleet_group_id = db.Column(db.Integer, db.ForeignKey('fleet_groups.id'), nullable=False)
+    dispatcher_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+
+    fleet_group = db.relationship('FleetGroup', backref=db.backref('dispatch_groups', lazy=True))
+    dispatcher = db.relationship('User', backref=db.backref('managed_dispatch_groups', lazy=True))
+
 class Vehicle(db.Model):
     __tablename__ = 'vehicles'
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
@@ -41,8 +61,11 @@ class Vehicle(db.Model):
     acquisition_cost = db.Column(db.Numeric(12, 2), nullable=False)
     acquisition_date = db.Column(db.Date)
     status = db.Column(db.Enum('Available', 'On Trip', 'In Shop', 'Retired', name='vehicle_status_enum'), default='Available')
+    dispatch_group_id = db.Column(db.Integer, db.ForeignKey('dispatch_groups.id'), nullable=True)
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
     updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
+
+    dispatch_group = db.relationship('DispatchGroup', backref=db.backref('vehicles', lazy=True))
 
 class Driver(db.Model):
     __tablename__ = 'drivers'
@@ -56,8 +79,11 @@ class Driver(db.Model):
     safety_score = db.Column(db.Numeric(5, 2), default=100)
     joining_date = db.Column(db.Date)
     status = db.Column(db.Enum('Available', 'On Trip', 'Off Duty', 'Suspended', name='driver_status_enum'), default='Available')
+    dispatch_group_id = db.Column(db.Integer, db.ForeignKey('dispatch_groups.id'), nullable=True)
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
     updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
+
+    dispatch_group = db.relationship('DispatchGroup', backref=db.backref('drivers', lazy=True))
 
     user = db.relationship('User', backref=db.backref('driver_profile', uselist=False, lazy=True))
 

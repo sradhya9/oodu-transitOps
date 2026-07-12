@@ -36,10 +36,10 @@ function App() {
           <Route path="drivers" element={<AuthGuard allowedRoles={['Fleet Manager', 'Safety Officer']}><Drivers /></AuthGuard>} />
           
           {/* Trips */}
-          <Route path="trips" element={<AuthGuard allowedRoles={['Dispatcher', 'Safety Officer']}><Trips /></AuthGuard>} />
+          <Route path="trips" element={<AuthGuard allowedRoles={['Dispatcher', 'Safety Officer', 'Driver']}><Trips /></AuthGuard>} />
           
           {/* Finance & Fuel */}
-          <Route path="fuel-logs" element={<AuthGuard allowedRoles={['Financial Analyst']}><FuelLogs /></AuthGuard>} />
+          <Route path="fuel-logs" element={<AuthGuard allowedRoles={['Financial Analyst', 'Driver']}><FuelLogs /></AuthGuard>} />
           <Route path="expenses" element={<AuthGuard allowedRoles={['Financial Analyst']}><Expenses /></AuthGuard>} />
           
           {/* Reports & Analytics */}

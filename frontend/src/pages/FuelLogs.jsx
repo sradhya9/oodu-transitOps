@@ -20,7 +20,7 @@ const FuelLogs = () => {
 
   const { user } = useContext(AuthContext);
   const role = user?.role || '';
-  const canAdd = role === 'Financial Analyst';
+  const canAdd = role === 'Financial Analyst' || role === 'Driver';
   const canEdit = role === 'Financial Analyst';
 
   // Search state for fuel logs

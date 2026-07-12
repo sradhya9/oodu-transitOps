@@ -16,7 +16,7 @@ const Trips = () => {
   const { user } = useContext(AuthContext);
   const role = user?.role || '';
   const canCreate = role === 'Dispatcher';
-  const canComplete = role === 'Dispatcher';
+  const canComplete = role === 'Dispatcher' || role === 'Driver';
 
   // Filters
   const [search, setSearch] = useState("");
