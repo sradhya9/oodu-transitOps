@@ -1,24 +1,39 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Outlet, NavLink, Link, useLocation } from 'react-router-dom';
+import { 
+  LayoutDashboard, Truck, Users, Route, 
+  Wrench, Droplet, PieChart, Settings, 
+  Sun, Moon, Search, Menu 
+} from 'lucide-react';
 import '../styles/layout.css';
 
 const MainLayout = () => {
   const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [theme, setTheme] = useState(localStorage.getItem('theme') || 'light');
   const location = useLocation();
+
+  useEffect(() => {
+    document.documentElement.setAttribute('data-theme', theme);
+    localStorage.setItem('theme', theme);
+  }, [theme]);
+
+  const toggleTheme = () => {
+    setTheme(theme === 'light' ? 'dark' : 'light');
+  };
 
   const toggleSidebar = () => {
     setSidebarOpen(!sidebarOpen);
   };
 
   const navLinks = [
-    { path: '/dashboard', label: 'Dashboard' },
-    { path: '/vehicles', label: 'Fleet' },
-    { path: '/drivers', label: 'Drivers' },
-    { path: '/trips', label: 'Trips' },
-    { path: '/maintenance', label: 'Maintenance' },
-    { path: '/fuel-logs', label: 'Fuel & Expenses' },
-    { path: '/reports', label: 'Analytics' },
-    { path: '/settings', label: 'Settings' }
+    { path: '/dashboard', label: 'Dashboard', icon: <LayoutDashboard size={18} strokeWidth={2.2} /> },
+    { path: '/vehicles', label: 'Fleet', icon: <Truck size={18} strokeWidth={2.2} /> },
+    { path: '/drivers', label: 'Drivers', icon: <Users size={18} strokeWidth={2.2} /> },
+    { path: '/trips', label: 'Trips', icon: <Route size={18} strokeWidth={2.2} /> },
+    { path: '/maintenance', label: 'Maintenance', icon: <Wrench size={18} strokeWidth={2.2} /> },
+    { path: '/fuel-logs', label: 'Fuel & Expenses', icon: <Droplet size={18} strokeWidth={2.2} /> },
+    { path: '/reports', label: 'Analytics', icon: <PieChart size={18} strokeWidth={2.2} /> },
+    { path: '/settings', label: 'Settings', icon: <Settings size={18} strokeWidth={2.2} /> }
   ];
 
   return (
@@ -42,6 +57,7 @@ const MainLayout = () => {
               className={({ isActive }) => `nav-item ${isActive ? 'active' : ''}`}
               onClick={() => setSidebarOpen(false)}
             >
+              {link.icon}
               {link.label}
             </NavLink>
           ))}
@@ -54,16 +70,22 @@ const MainLayout = () => {
         <header className="topbar">
           <div className="search-container">
             <button className="menu-toggle" onClick={toggleSidebar}>
-              ☰
+              <Menu size={24} />
             </button>
-            <input 
-              type="text" 
-              className="search-input" 
-              placeholder="Search..." 
-            />
+            <div className="search-wrapper">
+              <Search size={16} className="search-icon" />
+              <input 
+                type="text" 
+                className="search-input" 
+                placeholder="Search..." 
+              />
+            </div>
           </div>
           
           <div className="topbar-right">
+            <button onClick={toggleTheme} className="theme-toggle-btn" aria-label="Toggle Theme">
+              {theme === 'light' ? <Moon size={20} /> : <Sun size={20} />}
+            </button>
             <div className="user-profile">
               <div className="user-info">
                 <span className="user-name">Raven K.</span>
