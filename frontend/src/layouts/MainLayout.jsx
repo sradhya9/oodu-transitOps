@@ -61,7 +61,9 @@ const MainLayout = () => {
       {/* Sidebar */}
       <aside className={`sidebar ${sidebarOpen ? 'open' : ''}`}>
         <div className="sidebar-header">
-          <Link to="/" className="sidebar-logo">TransitOps</Link>
+          <Link to="/" className="sidebar-logo" style={{ display: 'flex', alignItems: 'center' }}>
+            <img src="/logo.svg" alt="TransitOps Logo" style={{ height: '40px', width: 'auto' }} />
+          </Link>
         </div>
         <nav className="nav-menu">
           {navLinks.map((link) => (
