@@ -7,6 +7,7 @@ import {
   updateMaintenance,
   deleteMaintenance
 } from '../services/maintenanceService';
+import { vehicleService } from '../services/vehicleService';
 import '../styles/dashboard.css';
 import '../styles/maintenance.css';
 
@@ -22,6 +23,9 @@ const Maintenance = () => {
   // Search & Filter State
   const [searchQuery, setSearchQuery] = useState('');
   const [statusFilter, setStatusFilter] = useState('All');
+  
+  // Vehicles for dropdown
+  const [allVehicles, setAllVehicles] = useState([]);
   
   // Modal State
   const [showModal, setShowModal] = useState(false);
@@ -58,8 +62,20 @@ const Maintenance = () => {
     }
   };
 
+  const fetchVehicles = async () => {
+    try {
+      const res = await vehicleService.getVehicles({ limit: 1000 });
+      if (res.success) {
+        setAllVehicles(res.data.items || res.data);
+      }
+    } catch (err) {
+      console.error("Failed to fetch vehicles:", err);
+    }
+  };
+
   useEffect(() => {
     fetchLogs();
+    fetchVehicles();
   }, []);
 
   // Form input change handler
@@ -211,6 +227,7 @@ const Maintenance = () => {
   const filteredLogs = logs.filter((log) => {
     const matchesSearch = 
       (log.vehicle_id && log.vehicle_id.toString().includes(searchQuery)) ||
+      (log.vehicle_registration && log.vehicle_registration.toLowerCase().includes(searchQuery.toLowerCase())) ||
       (log.maintenance_type && log.maintenance_type.toLowerCase().includes(searchQuery.toLowerCase())) ||
       (log.workshop && log.workshop.toLowerCase().includes(searchQuery.toLowerCase()));
       
@@ -269,7 +286,7 @@ const Maintenance = () => {
             <thead>
               <tr>
                 <th>Log ID</th>
-                <th>Vehicle ID</th>
+                <th>Vehicle</th>
                 <th>Maintenance Type</th>
                 <th>Workshop</th>
                 <th>Start Date</th>
@@ -283,7 +300,7 @@ const Maintenance = () => {
               {filteredLogs.map((log) => (
                 <tr key={log.id}>
                   <td>#{log.id}</td>
-                  <td>{log.vehicle_id}</td>
+                  <td>{log.vehicle_registration || log.vehicle_id}</td>
                   <td>{log.maintenance_type}</td>
                   <td>{log.workshop || <span style={{color: '#9CA3AF'}}>—</span>}</td>
                   <td>{log.start_date}</td>
@@ -326,16 +343,19 @@ const Maintenance = () => {
             <form onSubmit={handleFormSubmit}>
               <div className="form-row">
                 <div className="form-group">
-                  <label className="form-label">Vehicle ID *</label>
-                  <input 
-                    type="text" 
+                  <label className="form-label">Vehicle *</label>
+                  <select 
                     name="vehicle_id"
-                    className="form-input" 
-                    placeholder="e.g. 5"
+                    className="form-select"
                     value={formData.vehicle_id}
                     onChange={handleInputChange}
-                    disabled={isEditing} // Vehicle ID shouldn't change on edit
-                  />
+                    disabled={isEditing}
+                  >
+                    <option value="">Select a Vehicle</option>
+                    {allVehicles.map(v => (
+                      <option key={v.id} value={v.id}>{v.registration_number}</option>
+                    ))}
+                  </select>
                   {formErrors.vehicle_id && <span style={{color: '#EF4444', fontSize: '0.75rem'}}>{formErrors.vehicle_id}</span>}
                 </div>
                 
