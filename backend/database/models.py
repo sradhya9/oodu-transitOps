@@ -47,6 +47,7 @@ class Vehicle(db.Model):
 class Driver(db.Model):
     __tablename__ = 'drivers'
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
+    user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=True)
     full_name = db.Column(db.String(120), nullable=False)
     license_number = db.Column(db.String(100), nullable=False, unique=True)
     license_category = db.Column(db.String(20))
@@ -57,6 +58,8 @@ class Driver(db.Model):
     status = db.Column(db.Enum('Available', 'On Trip', 'Off Duty', 'Suspended', name='driver_status_enum'), default='Available')
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
     updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
+
+    user = db.relationship('User', backref=db.backref('driver_profile', uselist=False, lazy=True))
 
 class Trip(db.Model):
     __tablename__ = 'trips'

@@ -1,4 +1,4 @@
-from flask import Blueprint, jsonify
+from flask import Blueprint, jsonify, g
 from sqlalchemy import func
 from backend.database import db
 from backend.database.models import Vehicle, Driver, Trip
@@ -10,6 +10,27 @@ dashboard_bp = Blueprint('dashboard', __name__, url_prefix='/api/dashboard')
 @authenticate()
 def get_dashboard_stats():
     try:
+        user = g.current_user
+        
+        # If Driver, only return their trips
+        if user.role.role_name == 'Driver':
+            driver_profile = Driver.query.filter_by(user_id=user.id).first()
+            active_trips = 0
+            pending_trips = 0
+            if driver_profile:
+                active_trips = db.session.query(func.count(Trip.id)).filter(Trip.status == 'Dispatched', Trip.driver_id == driver_profile.id).scalar() or 0
+                pending_trips = db.session.query(func.count(Trip.id)).filter(Trip.status == 'Draft', Trip.driver_id == driver_profile.id).scalar() or 0
+                
+            return jsonify({
+                "activeVehicles": 0,
+                "availableVehicles": 0,
+                "maintenanceVehicles": 0,
+                "activeTrips": active_trips,
+                "pendingTrips": pending_trips,
+                "driversOnDuty": 0,
+                "fleetUtilization": 0
+            }), 200
+            
         # Vehicles
         total_vehicles = db.session.query(func.count(Vehicle.id)).filter(Vehicle.status != 'Retired').scalar() or 0
         available_vehicles = db.session.query(func.count(Vehicle.id)).filter(Vehicle.status == 'Available').scalar() or 0
@@ -48,8 +69,19 @@ def get_dashboard_stats():
 @authenticate()
 def get_recent_trips():
     try:
+        user = g.current_user
+        
+        query = db.session.query(Trip)
+        if user.role.role_name == 'Driver':
+            driver_profile = Driver.query.filter_by(user_id=user.id).first()
+            if driver_profile:
+                query = query.filter(Trip.driver_id == driver_profile.id)
+            else:
+                # No profile linked, return nothing
+                return jsonify([]), 200
+                
         # Fetch top 5 recent trips, order by id desc (or created_at)
-        recent_trips_query = db.session.query(Trip).order_by(Trip.id.desc()).limit(5).all()
+        recent_trips_query = query.order_by(Trip.id.desc()).limit(5).all()
         
         recent_trips = []
         for trip in recent_trips_query:
