@@ -1,6 +1,5 @@
 import { useState, useEffect } from 'react';
 import api from '../services/api';
-import { Truck, CheckCircle, PenTool, Route, Clock, Users, Percent } from 'lucide-react';
 import '../styles/dashboard.css';
 
 const Dashboard = () => {
@@ -62,11 +61,8 @@ const Dashboard = () => {
 
   return (
     <div className="dashboard-container">
-      <div className="page-header" style={{display: 'flex', justifyContent: 'space-between', alignItems: 'center'}}>
+      <div className="page-header">
         <h1 className="page-title">1. Dashboard</h1>
-        <button className="btn btn-primary">
-          <Route size={16} /> New Trip
-        </button>
       </div>
 
       <div className="filters-row">
@@ -93,52 +89,31 @@ const Dashboard = () => {
       <div className="kpi-grid">
         <div className="kpi-card blue">
           <span className="kpi-label">Active Vehicles</span>
-          <div style={{display: 'flex', alignItems: 'center', justifyContent: 'space-between'}}>
-            <span className="kpi-value">{stats.activeVehicles}</span>
-            <Truck size={28} color="var(--c-deep-sea)" opacity={0.8} />
-          </div>
+          <span className="kpi-value">{stats.activeVehicles}</span>
         </div>
         <div className="kpi-card green">
           <span className="kpi-label">Available Vehicles</span>
-          <div style={{display: 'flex', alignItems: 'center', justifyContent: 'space-between'}}>
-            <span className="kpi-value">{stats.availableVehicles}</span>
-            <CheckCircle size={28} color="#10B981" opacity={0.8} />
-          </div>
+          <span className="kpi-value">{stats.availableVehicles}</span>
         </div>
         <div className="kpi-card orange">
-          <span className="kpi-label">In Maintenance</span>
-          <div style={{display: 'flex', alignItems: 'center', justifyContent: 'space-between'}}>
-            <span className="kpi-value">{stats.maintenanceVehicles}</span>
-            <PenTool size={28} color="var(--c-kimchi)" opacity={0.8} />
-          </div>
+          <span className="kpi-label">Vehicles In Maintenance</span>
+          <span className="kpi-value">{stats.maintenanceVehicles}</span>
         </div>
         <div className="kpi-card blue">
           <span className="kpi-label">Active Trips</span>
-          <div style={{display: 'flex', alignItems: 'center', justifyContent: 'space-between'}}>
-            <span className="kpi-value">{stats.activeTrips}</span>
-            <Route size={28} color="var(--c-deep-sea)" opacity={0.8} />
-          </div>
+          <span className="kpi-value">{stats.activeTrips}</span>
         </div>
         <div className="kpi-card blue">
           <span className="kpi-label">Pending Trips</span>
-          <div style={{display: 'flex', alignItems: 'center', justifyContent: 'space-between'}}>
-            <span className="kpi-value">{stats.pendingTrips}</span>
-            <Clock size={28} color="var(--c-deep-sea)" opacity={0.8} />
-          </div>
+          <span className="kpi-value">{stats.pendingTrips}</span>
         </div>
         <div className="kpi-card blue">
           <span className="kpi-label">Drivers On Duty</span>
-          <div style={{display: 'flex', alignItems: 'center', justifyContent: 'space-between'}}>
-            <span className="kpi-value">{stats.driversOnDuty}</span>
-            <Users size={28} color="var(--c-deep-sea)" opacity={0.8} />
-          </div>
+          <span className="kpi-value">{stats.driversOnDuty}</span>
         </div>
         <div className="kpi-card green">
           <span className="kpi-label">Fleet Utilization</span>
-          <div style={{display: 'flex', alignItems: 'center', justifyContent: 'space-between'}}>
-            <span className="kpi-value">{stats.fleetUtilization}%</span>
-            <Percent size={28} color="#10B981" opacity={0.8} />
-          </div>
+          <span className="kpi-value">{stats.fleetUtilization}%</span>
         </div>
       </div>
 

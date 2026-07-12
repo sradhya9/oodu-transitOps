@@ -7,7 +7,10 @@ from sqlalchemy.exc import OperationalError
 from backend.config.settings import Config
 from backend.database import db, migrate
 from backend.routes.main_routes import main_bp
-from backend.routes.dashboard_routes import dashboard_bp
+from backend.routes.maintenance_routes import maintenance_bp
+from backend.routes.fuel_routes import fuel_bp
+from backend.routes.expense_routes import expense_bp
+from backend.routes.report_routes import report_bp
 
 def create_app(config_class=Config):
     app = Flask(__name__)
@@ -20,7 +23,10 @@ def create_app(config_class=Config):
 
     # Register blueprints
     app.register_blueprint(main_bp)
-    app.register_blueprint(dashboard_bp)
+    app.register_blueprint(maintenance_bp)
+    app.register_blueprint(fuel_bp)
+    app.register_blueprint(expense_bp)
+    app.register_blueprint(report_bp)
 
     from backend.routes.vehicle_routes import vehicle_bp
     app.register_blueprint(vehicle_bp)
