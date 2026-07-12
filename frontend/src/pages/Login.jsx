@@ -362,7 +362,7 @@ const Login = () => {
           )}
 
           {/* Access Scoped Legend */}
-          <div style={{ marginTop: '48px', borderTop: '1px solid #E5E7EB', paddingTop: '24px' }}>
+          {/*<div style={{ marginTop: '48px', borderTop: '1px solid #E5E7EB', paddingTop: '24px' }}>
             <h4 style={{ fontSize: '0.8rem', color: '#9CA3AF', fontWeight: '500', marginBottom: '12px' }}>Access is scoped by role after login:</h4>
             <ul style={{ listStyle: 'none', padding: 0, margin: 0, display: 'flex', flexDirection: 'column', gap: '8px', fontSize: '0.85rem', color: '#6B7280' }}>
               <li>• Fleet Manager → Fleet, Maintenance, Settings</li>
@@ -370,7 +370,7 @@ const Login = () => {
               <li>• Safety Officer → Drivers, Compliance</li>
               <li>• Financial Analyst → Fuel & Expenses, Analytics</li>
             </ul>
-          </div>
+          </div>*/}
         </div>
       </div>
 

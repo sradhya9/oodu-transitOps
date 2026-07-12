@@ -8,6 +8,7 @@ import {
   deleteMaintenance
 } from '../services/maintenanceService';
 import { vehicleService } from '../services/vehicleService';
+import Modal from '../components/Modal';
 import '../styles/dashboard.css';
 import '../styles/maintenance.css';
 
@@ -330,138 +331,133 @@ const Maintenance = () => {
       )}
 
       {/* Modal Dialog Form */}
-      {showModal && (
-        <div className="modal-overlay" onClick={() => setShowModal(false)}>
-          <div className="modal-container" onClick={(e) => e.stopPropagation()}>
-            <div className="modal-header">
-              <h2 className="modal-title">{isEditing ? `Edit Maintenance Record #${currentLogId}` : 'Log New Maintenance'}</h2>
-              <button className="modal-close-btn" onClick={() => setShowModal(false)}>×</button>
+      <Modal 
+        isOpen={showModal} 
+        onClose={() => setShowModal(false)} 
+        title={isEditing ? `Edit Maintenance Record #${currentLogId}` : 'Log New Maintenance'}
+      >
+        {formSubmitError && <div className="error-alert">{formSubmitError}</div>}
+        
+        <form onSubmit={handleFormSubmit}>
+          <div className="form-row">
+            <div className="form-group">
+              <label className="form-label">Vehicle *</label>
+              <select 
+                name="vehicle_id"
+                className="form-select"
+                value={formData.vehicle_id}
+                onChange={handleInputChange}
+                disabled={isEditing}
+              >
+                <option value="">Select a Vehicle</option>
+                {allVehicles.map(v => (
+                  <option key={v.id} value={v.id}>{v.registration_number}</option>
+                ))}
+              </select>
+              {formErrors.vehicle_id && <span style={{color: '#EF4444', fontSize: '0.75rem'}}>{formErrors.vehicle_id}</span>}
             </div>
             
-            {formSubmitError && <div className="error-alert">{formSubmitError}</div>}
-            
-            <form onSubmit={handleFormSubmit}>
-              <div className="form-row">
-                <div className="form-group">
-                  <label className="form-label">Vehicle *</label>
-                  <select 
-                    name="vehicle_id"
-                    className="form-select"
-                    value={formData.vehicle_id}
-                    onChange={handleInputChange}
-                    disabled={isEditing}
-                  >
-                    <option value="">Select a Vehicle</option>
-                    {allVehicles.map(v => (
-                      <option key={v.id} value={v.id}>{v.registration_number}</option>
-                    ))}
-                  </select>
-                  {formErrors.vehicle_id && <span style={{color: '#EF4444', fontSize: '0.75rem'}}>{formErrors.vehicle_id}</span>}
-                </div>
-                
-                <div className="form-group">
-                  <label className="form-label">Maintenance Type *</label>
-                  <input 
-                    type="text" 
-                    name="maintenance_type"
-                    className="form-input" 
-                    placeholder="e.g. Engine Repair"
-                    value={formData.maintenance_type}
-                    onChange={handleInputChange}
-                  />
-                  {formErrors.maintenance_type && <span style={{color: '#EF4444', fontSize: '0.75rem'}}>{formErrors.maintenance_type}</span>}
-                </div>
-              </div>
-
-              <div className="form-row">
-                <div className="form-group">
-                  <label className="form-label">Workshop</label>
-                  <input 
-                    type="text" 
-                    name="workshop"
-                    className="form-input" 
-                    placeholder="e.g. City Garage"
-                    value={formData.workshop}
-                    onChange={handleInputChange}
-                  />
-                  {formErrors.workshop && <span style={{color: '#EF4444', fontSize: '0.75rem'}}>{formErrors.workshop}</span>}
-                </div>
-                
-                <div className="form-group">
-                  <label className="form-label">Cost (₹)</label>
-                  <input 
-                    type="text" 
-                    name="maintenance_cost"
-                    className="form-input" 
-                    placeholder="e.g. 350.00"
-                    value={formData.maintenance_cost}
-                    onChange={handleInputChange}
-                  />
-                  {formErrors.maintenance_cost && <span style={{color: '#EF4444', fontSize: '0.75rem'}}>{formErrors.maintenance_cost}</span>}
-                </div>
-              </div>
-
-              <div className="form-row">
-                <div className="form-group">
-                  <label className="form-label">Start Date *</label>
-                  <input 
-                    type="date" 
-                    name="start_date"
-                    className="form-input" 
-                    value={formData.start_date}
-                    onChange={handleInputChange}
-                  />
-                  {formErrors.start_date && <span style={{color: '#EF4444', fontSize: '0.75rem'}}>{formErrors.start_date}</span>}
-                </div>
-                
-                <div className="form-group">
-                  <label className="form-label">End Date</label>
-                  <input 
-                    type="date" 
-                    name="end_date"
-                    className="form-input" 
-                    value={formData.end_date}
-                    onChange={handleInputChange}
-                  />
-                  {formErrors.end_date && <span style={{color: '#EF4444', fontSize: '0.75rem'}}>{formErrors.end_date}</span>}
-                </div>
-              </div>
-
-              <div className="form-group">
-                <label className="form-label">Status *</label>
-                <select 
-                  name="status"
-                  className="form-select"
-                  value={formData.status}
-                  onChange={handleInputChange}
-                >
-                  <option value="Open">Open</option>
-                  <option value="Completed">Completed</option>
-                </select>
-                {formErrors.status && <span style={{color: '#EF4444', fontSize: '0.75rem'}}>{formErrors.status}</span>}
-              </div>
-
-              <div className="form-group">
-                <label className="form-label">Description</label>
-                <textarea 
-                  name="description"
-                  className="form-input" 
-                  style={{ minHeight: '80px', resize: 'vertical' }}
-                  placeholder="Details of the maintenance work..."
-                  value={formData.description}
-                  onChange={handleInputChange}
-                />
-                {formErrors.description && <span style={{color: '#EF4444', fontSize: '0.75rem'}}>{formErrors.description}</span>}
-              </div>
-
-              <div className="modal-footer">
-                <button type="button" className="btn-secondary" onClick={() => setShowModal(false)}>Cancel</button>
-                <button type="submit" className="btn-primary">{isEditing ? 'Save Changes' : 'Create Record'}</button>
-              </div>
-            </form>
+            <div className="form-group">
+              <label className="form-label">Maintenance Type *</label>
+              <input 
+                type="text" 
+                name="maintenance_type"
+                className="form-input" 
+                placeholder="e.g. Engine Repair"
+                value={formData.maintenance_type}
+                onChange={handleInputChange}
+              />
+              {formErrors.maintenance_type && <span style={{color: '#EF4444', fontSize: '0.75rem'}}>{formErrors.maintenance_type}</span>}
+            </div>
           </div>
-        </div>
-      )}
+
+          <div className="form-row">
+            <div className="form-group">
+              <label className="form-label">Workshop</label>
+              <input 
+                type="text" 
+                name="workshop"
+                className="form-input" 
+                placeholder="e.g. City Garage"
+                value={formData.workshop}
+                onChange={handleInputChange}
+              />
+              {formErrors.workshop && <span style={{color: '#EF4444', fontSize: '0.75rem'}}>{formErrors.workshop}</span>}
+            </div>
+            
+            <div className="form-group">
+              <label className="form-label">Cost (₹)</label>
+              <input 
+                type="text" 
+                name="maintenance_cost"
+                className="form-input" 
+                placeholder="e.g. 350.00"
+                value={formData.maintenance_cost}
+                onChange={handleInputChange}
+              />
+              {formErrors.maintenance_cost && <span style={{color: '#EF4444', fontSize: '0.75rem'}}>{formErrors.maintenance_cost}</span>}
+            </div>
+          </div>
+
+          <div className="form-row">
+            <div className="form-group">
+              <label className="form-label">Start Date *</label>
+              <input 
+                type="date" 
+                name="start_date"
+                className="form-input" 
+                value={formData.start_date}
+                onChange={handleInputChange}
+              />
+              {formErrors.start_date && <span style={{color: '#EF4444', fontSize: '0.75rem'}}>{formErrors.start_date}</span>}
+            </div>
+            
+            <div className="form-group">
+              <label className="form-label">End Date</label>
+              <input 
+                type="date" 
+                name="end_date"
+                className="form-input" 
+                value={formData.end_date}
+                onChange={handleInputChange}
+              />
+              {formErrors.end_date && <span style={{color: '#EF4444', fontSize: '0.75rem'}}>{formErrors.end_date}</span>}
+            </div>
+          </div>
+
+          <div className="form-group">
+            <label className="form-label">Status *</label>
+            <select 
+              name="status"
+              className="form-select"
+              value={formData.status}
+              onChange={handleInputChange}
+            >
+              <option value="Open">Open</option>
+              <option value="Completed">Completed</option>
+            </select>
+            {formErrors.status && <span style={{color: '#EF4444', fontSize: '0.75rem'}}>{formErrors.status}</span>}
+          </div>
+
+          <div className="form-group">
+            <label className="form-label">Description</label>
+            <textarea 
+              name="description"
+              className="form-input" 
+              style={{ minHeight: '80px', resize: 'vertical' }}
+              placeholder="Details of the maintenance work..."
+              value={formData.description}
+              onChange={handleInputChange}
+            />
+            {formErrors.description && <span style={{color: '#EF4444', fontSize: '0.75rem'}}>{formErrors.description}</span>}
+          </div>
+
+          <div className="form-actions" style={{ display: 'flex', justifyContent: 'flex-end', gap: '12px', marginTop: '20px' }}>
+            <button type="button" className="btn-secondary" onClick={() => setShowModal(false)}>Cancel</button>
+            <button type="submit" className="btn-primary">{isEditing ? 'Save Changes' : 'Create Record'}</button>
+          </div>
+        </form>
+      </Modal>
     </div>
   );
 };
