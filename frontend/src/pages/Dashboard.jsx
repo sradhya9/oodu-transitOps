@@ -11,7 +11,7 @@ const Dashboard = () => {
     status: 'LOADING',
     database: 'LOADING'
   });
-  
+
   const [stats, setStats] = useState({
     activeVehicles: 0,
     availableVehicles: 0,
@@ -55,26 +55,26 @@ const Dashboard = () => {
       }
     };
     checkHealth();
-    
+
     const fetchDashboardData = async () => {
       try {
         const statsResponse = await api.get('/api/dashboard/stats');
         setStats(statsResponse.data);
-        
+
         const tripsResponse = await api.get('/api/dashboard/recent-trips');
         setRecentTrips(tripsResponse.data);
       } catch (error) {
         console.error("Failed to fetch dashboard data:", error);
       }
     };
-    
+
     fetchDashboardData();
   }, []);
 
   return (
     <div className="dashboard-container">
       <div className="page-header">
-        <h1 className="page-title">1. Dashboard</h1>
+        <strong><h1 className="page-title">Dashboard</h1></strong>
       </div>
 
       <div className="filters-row">
@@ -179,7 +179,7 @@ const Dashboard = () => {
                 </tr>
               )) : (
                 <tr>
-                  <td colSpan="5" style={{textAlign: 'center', padding: '24px 0', color: 'var(--text-muted)'}}>No recent trips found</td>
+                  <td colSpan="5" style={{ textAlign: 'center', padding: '24px 0', color: 'var(--text-muted)' }}>No recent trips found</td>
                 </tr>
               )}
             </tbody>
@@ -214,8 +214,8 @@ const Dashboard = () => {
       <div className="health-status-box">
         <h3>System Status (API)</h3>
         <p>
-          Backend: 
-          <span style={{ 
+          Backend:
+          <span style={{
             color: health.status === 'OK' ? '#10B981' : (health.status === 'LOADING' ? '#9CA3AF' : '#EF4444'),
             fontWeight: '600',
             marginLeft: '10px'
@@ -224,8 +224,8 @@ const Dashboard = () => {
           </span>
         </p>
         <p>
-          Database: 
-          <span style={{ 
+          Database:
+          <span style={{
             color: health.database === 'Connected' ? '#10B981' : (health.database === 'LOADING' ? '#9CA3AF' : '#EF4444'),
             fontWeight: '600',
             marginLeft: '10px'
