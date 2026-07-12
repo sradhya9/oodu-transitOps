@@ -42,7 +42,7 @@ const Settings = () => {
   return (
     <div className="dashboard-container">
       <div className="page-header">
-        <h1 className="page-title">Settings & Admin</h1>
+        <h1 className="page-title">Settings</h1>
       </div>
 
       <div className="dashboard-content-grid" style={{ gridTemplateColumns: '1fr', marginTop: '24px' }}>
@@ -51,7 +51,7 @@ const Settings = () => {
             <Key size={24} color="var(--c-kimchi)" />
             <h2 className="section-title" style={{ margin: 0 }}>Pending Password Resets</h2>
           </div>
-          
+
           {error && (
             <div style={{ backgroundColor: 'rgba(255, 91, 4, 0.1)', color: 'var(--c-kimchi)', padding: '12px', borderRadius: '8px', marginBottom: '16px', border: '1px solid rgba(255, 91, 4, 0.2)' }}>
               {error}
@@ -64,8 +64,8 @@ const Settings = () => {
                 <CheckCircle size={22} /> Request Approved
               </h3>
               <p style={{ margin: '0 0 16px 0', fontSize: '0.95rem', color: 'var(--text-secondary)', lineHeight: '1.5' }}>
-                You have approved the reset for <strong style={{ color: 'var(--text-primary)' }}>{approvedCode.email}</strong>. 
-                Please securely provide them with this <strong>Special Access Code</strong>. 
+                You have approved the reset for <strong style={{ color: 'var(--text-primary)' }}>{approvedCode.email}</strong>.
+                Please securely provide them with this <strong>Special Access Code</strong>.
                 (The emailed code would be sent automatically in production).
               </p>
               <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px' }}>
@@ -102,9 +102,9 @@ const Settings = () => {
                     <td><span className="status-badge drafted">{req.role}</span></td>
                     <td>{new Date(req.requested_at).toLocaleString()}</td>
                     <td>
-                      <button 
+                      <button
                         onClick={() => handleApprove(req.id, req.email)}
-                        className="btn btn-primary" 
+                        className="btn btn-primary"
                         style={{ padding: '6px 12px', fontSize: '0.85rem' }}
                       >
                         Approve & Generate Code
