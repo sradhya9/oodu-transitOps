@@ -9,6 +9,7 @@ def serialize_maintenance(log):
     return {
         "id": log.id,
         "vehicle_id": log.vehicle_id,
+        "vehicle_registration": log.vehicle.registration_number if log.vehicle else f"#{log.vehicle_id}",
         "maintenance_type": log.maintenance_type,
         "description": log.description,
         "workshop": log.workshop,
