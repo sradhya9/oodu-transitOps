@@ -1,4 +1,6 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useContext } from 'react';
+import { AuthContext } from '../context/AuthContext';
+import { Edit2, Trash2, Plus } from 'lucide-react';
 import {
   getExpenses,
   createExpense,
@@ -14,6 +16,10 @@ const Expenses = () => {
   const [expenses, setExpenses] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+
+  const { user } = useContext(AuthContext);
+  const role = user?.role || '';
+  const canEdit = role === 'Financial Analyst';
 
   // Search & Filter State
   const [searchQuery, setSearchQuery] = useState('');
@@ -243,9 +249,11 @@ const Expenses = () => {
             </select>
           </div>
         </div>
-        <button className="btn-primary" onClick={handleOpenAdd} style={{ alignSelf: 'flex-end' }}>
-          + Add Expense
-        </button>
+        {canEdit && (
+          <button className="btn-primary" onClick={handleOpenAdd} style={{ alignSelf: 'flex-end' }}>
+            <Plus size={18} strokeWidth={2.5} /> Add Expense
+          </button>
+        )}
       </div>
 
       {error && <div className="error-alert">{error}</div>}
@@ -267,7 +275,7 @@ const Expenses = () => {
                 <th>Vehicle ID</th>
                 <th>Trip ID</th>
                 <th>Description</th>
-                <th>Actions</th>
+                {canEdit && <th>Actions</th>}
               </tr>
             </thead>
             <tbody>
@@ -279,17 +287,19 @@ const Expenses = () => {
                       {exp.expense_type}
                     </span>
                   </td>
-                  <td>${exp.amount.toFixed(2)}</td>
+                  <td>₹{exp.amount.toFixed(2)}</td>
                   <td>{exp.expense_date}</td>
                   <td>{exp.vehicle_id !== null ? exp.vehicle_id : <span style={{ color: '#9CA3AF' }}>—</span>}</td>
                   <td>{exp.trip_id !== null ? exp.trip_id : <span style={{ color: '#9CA3AF' }}>—</span>}</td>
                   <td style={{ maxWidth: '200px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }} title={exp.description}>
                     {exp.description || <span style={{ color: '#9CA3AF' }}>—</span>}
                   </td>
-                  <td>
-                    <button className="btn-edit" onClick={() => handleOpenEdit(exp)}>Edit</button>
-                    <button className="btn-danger" onClick={() => handleDeleteExpense(exp.id)}>Delete</button>
-                  </td>
+                  {canEdit && (
+                    <td style={{ display: 'flex', gap: '8px' }}>
+                      <button className="btn-edit btn-icon-only" title="Edit Expense" onClick={() => handleOpenEdit(exp)}><Edit2 size={16} /></button>
+                      <button className="btn-danger btn-icon-only" title="Delete Expense" onClick={() => handleDeleteExpense(exp.id)}><Trash2 size={16} /></button>
+                    </td>
+                  )}
                 </tr>
               ))}
             </tbody>
@@ -331,7 +341,7 @@ const Expenses = () => {
                 </div>
 
                 <div className="form-group">
-                  <label className="form-label">Amount ($) *</label>
+                  <label className="form-label">Amount (₹) *</label>
                   <input
                     type="text"
                     name="amount"

@@ -196,3 +196,24 @@
   color: var(--text-muted);
   margin-bottom: 4px;
 }
+
+@media (max-width: 900px) {
+  .dashboard-content-grid {
+    grid-template-columns: 1fr;
+    gap: 24px;
+  }
+}
+
+@media (max-width: 768px) {
+  .kpi-grid {
+    grid-template-columns: 1fr;
+  }
+  
+  .report-section-card > div {
+    grid-template-columns: 1fr !important;
+  }
+  
+  .chart-wrapper {
+    margin-top: 24px;
+  }
+}

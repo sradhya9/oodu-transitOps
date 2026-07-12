@@ -1,4 +1,6 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback, useContext } from 'react';
+import { AuthContext } from '../context/AuthContext';
+import { Eye, Edit2, Trash2, Plus } from 'lucide-react';
 import { vehicleService } from '../services/vehicleService';
 import Modal from '../components/Modal';
 import Toast from '../components/Toast';
@@ -8,7 +10,11 @@ const Vehicles = () => {
   const [vehicles, setVehicles] = useState([]);
   const [kpis, setKpis] = useState({ total: 0, available: 0, onTrip: 0, inShop: 0, retired: 0 });
   const [loading, setLoading] = useState(true);
-  
+  const { user } = useContext(AuthContext);
+  const role = user?.role || '';
+  const canEdit = role === 'Fleet Manager';
+  const canViewFinance = role === 'Fleet Manager' || role === 'Financial Analyst';
+
   // Pagination, Search, Filter, Sort state
   const [page, setPage] = useState(1);
   const [limit, setLimit] = useState(10);
@@ -211,7 +217,7 @@ const Vehicles = () => {
           <h1>Vehicle Management</h1>
           <p>Manage all fleet vehicles</p>
         </div>
-        <button className="add-btn" onClick={() => openModal('add')}>+ Add Vehicle</button>
+        {canEdit && <button className="add-btn" onClick={() => openModal('add')}><Plus size={18} strokeWidth={2.5} /> Add Vehicle</button>}
       </div>
 
       <div className="kpi-grid">
@@ -278,7 +284,7 @@ const Vehicles = () => {
         ) : vehicles.length === 0 ? (
           <div className="empty-state">
             <p>No vehicles found.</p>
-            <button className="add-btn" style={{marginTop: '16px'}} onClick={() => openModal('add')}>Add Vehicle</button>
+            {canEdit && <button className="add-btn" style={{marginTop: '16px'}} onClick={() => openModal('add')}><Plus size={18} strokeWidth={2.5} /> Add Vehicle</button>}
           </div>
         ) : (
           <>
@@ -290,7 +296,7 @@ const Vehicles = () => {
                   <th onClick={() => handleSort('vehicle_type')}>Type {sortBy === 'vehicle_type' && <span className="sort-indicator">{sortOrder === 'asc' ? '↑' : '↓'}</span>}</th>
                   <th onClick={() => handleSort('max_load_capacity')}>Capacity</th>
                   <th onClick={() => handleSort('odometer')}>Odometer {sortBy === 'odometer' && <span className="sort-indicator">{sortOrder === 'asc' ? '↑' : '↓'}</span>}</th>
-                  <th onClick={() => handleSort('acquisition_cost')}>Cost {sortBy === 'acquisition_cost' && <span className="sort-indicator">{sortOrder === 'asc' ? '↑' : '↓'}</span>}</th>
+                  {canViewFinance && <th onClick={() => handleSort('acquisition_cost')}>Cost {sortBy === 'acquisition_cost' && <span className="sort-indicator">{sortOrder === 'asc' ? '↑' : '↓'}</span>}</th>}
                   <th onClick={() => handleSort('acquisition_date')}>Purchase Date {sortBy === 'acquisition_date' && <span className="sort-indicator">{sortOrder === 'asc' ? '↑' : '↓'}</span>}</th>
                   <th>Status</th>
                   <th>Actions</th>
@@ -304,13 +310,17 @@ const Vehicles = () => {
                     <td>{v.vehicle_type}</td>
                     <td>{v.max_load_capacity}</td>
                     <td>{v.odometer}</td>
-                    <td>${v.acquisition_cost}</td>
+                    {canViewFinance && <td>₹{v.acquisition_cost}</td>}
                     <td>{v.acquisition_date}</td>
                     <td><span className={`status-badge ${getStatusClass(v.status)}`}>{v.status}</span></td>
                     <td className="actions-cell">
-                      <button className="action-btn" onClick={() => openModal('view', v)}>View</button>
-                      <button className="action-btn" onClick={() => openModal('edit', v)} disabled={v.status === 'Retired'}>Edit</button>
-                      <button className="action-btn delete" onClick={() => openModal('delete', v)}>Delete</button>
+                      <button className="action-btn btn-icon-only" title="View Details" onClick={() => openModal('view', v)}><Eye size={16} /></button>
+                      {canEdit && (
+                        <>
+                          <button className="action-btn btn-icon-only" title="Edit Vehicle" onClick={() => openModal('edit', v)} disabled={v.status === 'Retired'}><Edit2 size={16} /></button>
+                          <button className="action-btn delete btn-icon-only" title="Delete Vehicle" onClick={() => openModal('delete', v)}><Trash2 size={16} /></button>
+                        </>
+                      )}
                     </td>
                   </tr>
                 ))}
@@ -359,7 +369,7 @@ const Vehicles = () => {
               <div className="detail-item"><div className="detail-label">Type</div><div className="detail-value">{formData.vehicle_type}</div></div>
               <div className="detail-item"><div className="detail-label">Max Load Capacity</div><div className="detail-value">{formData.max_load_capacity}</div></div>
               <div className="detail-item"><div className="detail-label">Odometer</div><div className="detail-value">{formData.odometer}</div></div>
-              <div className="detail-item"><div className="detail-label">Acquisition Cost</div><div className="detail-value">${formData.acquisition_cost}</div></div>
+              {canViewFinance && <div className="detail-item"><div className="detail-label">Acquisition Cost</div><div className="detail-value">₹{formData.acquisition_cost}</div></div>}
               <div className="detail-item"><div className="detail-label">Purchase Date</div><div className="detail-value">{formData.acquisition_date || 'N/A'}</div></div>
             </div>
             <div className="form-actions">

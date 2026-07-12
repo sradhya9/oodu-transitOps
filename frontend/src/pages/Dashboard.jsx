@@ -1,8 +1,12 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useContext } from 'react';
+import { AuthContext } from '../context/AuthContext';
 import api from '../services/api';
 import '../styles/dashboard.css';
 
 const Dashboard = () => {
+  const { user } = useContext(AuthContext);
+  const role = user?.role || '';
+
   const [health, setHealth] = useState({
     status: 'LOADING',
     database: 'LOADING'
@@ -87,34 +91,48 @@ const Dashboard = () => {
       </div>
 
       <div className="kpi-grid">
-        <div className="kpi-card blue">
-          <span className="kpi-label">Active Vehicles</span>
-          <span className="kpi-value">{stats.activeVehicles}</span>
-        </div>
-        <div className="kpi-card green">
-          <span className="kpi-label">Available Vehicles</span>
-          <span className="kpi-value">{stats.availableVehicles}</span>
-        </div>
-        <div className="kpi-card orange">
-          <span className="kpi-label">Vehicles In Maintenance</span>
-          <span className="kpi-value">{stats.maintenanceVehicles}</span>
-        </div>
-        <div className="kpi-card blue">
-          <span className="kpi-label">Active Trips</span>
-          <span className="kpi-value">{stats.activeTrips}</span>
-        </div>
-        <div className="kpi-card blue">
-          <span className="kpi-label">Pending Trips</span>
-          <span className="kpi-value">{stats.pendingTrips}</span>
-        </div>
-        <div className="kpi-card blue">
-          <span className="kpi-label">Drivers On Duty</span>
-          <span className="kpi-value">{stats.driversOnDuty}</span>
-        </div>
-        <div className="kpi-card green">
-          <span className="kpi-label">Fleet Utilization</span>
-          <span className="kpi-value">{stats.fleetUtilization}%</span>
-        </div>
+        {(role === 'Fleet Manager' || role === 'Dispatcher' || role === 'Safety Officer') && (
+          <div className="kpi-card blue">
+            <span className="kpi-label">Active Vehicles</span>
+            <span className="kpi-value">{stats.activeVehicles}</span>
+          </div>
+        )}
+        {(role === 'Fleet Manager' || role === 'Dispatcher' || role === 'Safety Officer') && (
+          <div className="kpi-card green">
+            <span className="kpi-label">Available Vehicles</span>
+            <span className="kpi-value">{stats.availableVehicles}</span>
+          </div>
+        )}
+        {(role === 'Fleet Manager' || role === 'Financial Analyst') && (
+          <div className="kpi-card orange">
+            <span className="kpi-label">Vehicles In Maintenance</span>
+            <span className="kpi-value">{stats.maintenanceVehicles}</span>
+          </div>
+        )}
+        {(role === 'Fleet Manager' || role === 'Dispatcher') && (
+          <div className="kpi-card blue">
+            <span className="kpi-label">Active Trips</span>
+            <span className="kpi-value">{stats.activeTrips}</span>
+          </div>
+        )}
+        {(role === 'Fleet Manager' || role === 'Dispatcher') && (
+          <div className="kpi-card blue">
+            <span className="kpi-label">Pending Trips</span>
+            <span className="kpi-value">{stats.pendingTrips}</span>
+          </div>
+        )}
+        {(role === 'Fleet Manager' || role === 'Dispatcher' || role === 'Safety Officer') && (
+          <div className="kpi-card blue">
+            <span className="kpi-label">Drivers On Duty</span>
+            <span className="kpi-value">{stats.driversOnDuty}</span>
+          </div>
+        )}
+        {(role === 'Fleet Manager' || role === 'Financial Analyst' || role === 'Safety Officer') && (
+          <div className="kpi-card green">
+            <span className="kpi-label">Fleet Utilization</span>
+            <span className="kpi-value">{stats.fleetUtilization}%</span>
+          </div>
+        )}
       </div>
 
       <div className="dashboard-content-grid">
