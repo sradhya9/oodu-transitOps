@@ -2,7 +2,7 @@ from flask import Blueprint, request, jsonify, g
 from datetime import datetime
 from backend.database import db
 from backend.database.models import Expense
-from backend.middleware.auth import authenticate
+from backend.middleware.auth import authenticate, authorize
 
 expense_bp = Blueprint('expenses', __name__, url_prefix='/expenses')
 
@@ -32,6 +32,7 @@ def parse_date(date_str):
 # GET /expenses - Return all expense records
 @expense_bp.route('', methods=['GET'])
 @authenticate()
+@authorize(roles=['Financial Analyst'])
 def get_all_expenses():
     try:
         user = g.current_user
@@ -46,6 +47,8 @@ def get_all_expenses():
 
 # GET /expenses/<id> - Return one expense record
 @expense_bp.route('/<int:log_id>', methods=['GET'])
+@authenticate()
+@authorize(roles=['Financial Analyst'])
 def get_expense(log_id):
     try:
         log = Expense.query.get(log_id)
@@ -58,6 +61,7 @@ def get_expense(log_id):
 # POST /expenses - Create a new expense record
 @expense_bp.route('', methods=['POST'])
 @authenticate()
+@authorize(roles=['Financial Analyst'])
 def create_expense():
     data = request.get_json() or {}
     errors = {}
@@ -147,6 +151,7 @@ def create_expense():
 # PUT /expenses/<id> - Update an existing expense record
 @expense_bp.route('/<int:log_id>', methods=['PUT'])
 @authenticate()
+@authorize(roles=['Financial Analyst'])
 def update_expense(log_id):
     try:
         log = Expense.query.get(log_id)
@@ -236,6 +241,7 @@ def update_expense(log_id):
 # DELETE /expenses/<id> - Delete an expense record
 @expense_bp.route('/<int:log_id>', methods=['DELETE'])
 @authenticate()
+@authorize(roles=['Financial Analyst'])
 def delete_expense(log_id):
     try:
         log = Expense.query.get(log_id)

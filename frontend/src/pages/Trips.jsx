@@ -15,7 +15,8 @@ const Trips = () => {
   const [loading, setLoading] = useState(false);
   const { user } = useContext(AuthContext);
   const role = user?.role || '';
-  const canEdit = role === 'Fleet Manager' || role === 'Dispatcher' || role === 'System Admin';
+  const canCreate = role === 'Dispatcher';
+  const canComplete = role === 'Dispatcher';
 
   // Filters
   const [search, setSearch] = useState("");
@@ -251,7 +252,7 @@ const Trips = () => {
           <h1>Trip Management</h1>
           <p>Manage fleet operations and trips</p>
         </div>
-        {canEdit && (
+        {canCreate && (
           <button className="add-btn" onClick={() => openModal("add")}>
             <Plus size={18} strokeWidth={2.5} /> Create Trip
           </button>
@@ -321,7 +322,7 @@ const Trips = () => {
         ) : trips.length === 0 ? (
           <div className="empty-state">
             <p>No trips found.</p>
-            {canEdit && (
+            {canCreate && (
               <button className="add-btn" style={{marginTop: '16px'}} onClick={() => openModal('add')}>
                 <Plus size={18} strokeWidth={2.5} /> Create Trip
               </button>
@@ -359,17 +360,21 @@ const Trips = () => {
                     <td className="actions-cell">
                       <button className="action-btn btn-icon-only" title="View Details" onClick={() => openModal("view", t)}><Eye size={16} /></button>
 
-                      {canEdit && t.status === 'Draft' && (
+                      {canCreate && t.status === 'Draft' && (
                         <>
                           <button className="action-btn btn-icon-only" title="Dispatch Trip" onClick={() => openModal("dispatch", t)} style={{ color: '#3B82F6' }}><Play size={16} /></button>
                           <button className="action-btn delete btn-icon-only" title="Cancel Trip" onClick={() => openModal("cancel", t)}><XCircle size={16} /></button>
                         </>
                       )}
 
-                      {canEdit && t.status === 'Dispatched' && (
+                      {t.status === 'Dispatched' && (
                         <>
-                          <button className="action-btn btn-icon-only" title="Complete Trip" onClick={() => openModal("complete", t)} style={{ color: '#10B981' }}><CheckCircle size={16} /></button>
-                          <button className="action-btn delete btn-icon-only" title="Cancel Trip" onClick={() => openModal("cancel", t)}><XCircle size={16} /></button>
+                          {canComplete && (
+                            <button className="action-btn btn-icon-only" title="Complete Trip" onClick={() => openModal("complete", t)} style={{ color: '#10B981' }}><CheckCircle size={16} /></button>
+                          )}
+                          {canCreate && (
+                            <button className="action-btn delete btn-icon-only" title="Cancel Trip" onClick={() => openModal("cancel", t)}><XCircle size={16} /></button>
+                          )}
                         </>
                       )}
                     </td>

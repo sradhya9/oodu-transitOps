@@ -27,23 +27,23 @@ function App() {
           <Route path="/dashboard" element={<Dashboard />} />
           
           {/* Vehicles / Fleet */}
-          <Route path="vehicles" element={<AuthGuard allowedRoles={['Fleet Manager', 'Dispatcher', 'Safety Officer', 'Financial Analyst']}><Vehicles /></AuthGuard>} />
+          <Route path="vehicles" element={<AuthGuard allowedRoles={['Fleet Manager', 'Dispatcher', 'Financial Analyst']}><Vehicles /></AuthGuard>} />
           
           {/* Maintenance */}
           <Route path="maintenance" element={<AuthGuard allowedRoles={['Fleet Manager', 'Financial Analyst']}><Maintenance /></AuthGuard>} />
           
           {/* Drivers */}
-          <Route path="drivers" element={<AuthGuard allowedRoles={['Fleet Manager', 'Safety Officer', 'Dispatcher']}><Drivers /></AuthGuard>} />
+          <Route path="drivers" element={<AuthGuard allowedRoles={['Fleet Manager', 'Safety Officer']}><Drivers /></AuthGuard>} />
           
           {/* Trips */}
-          <Route path="trips" element={<AuthGuard allowedRoles={['Fleet Manager', 'Dispatcher', 'Safety Officer', 'Financial Analyst', 'Driver']}><Trips /></AuthGuard>} />
+          <Route path="trips" element={<AuthGuard allowedRoles={['Dispatcher', 'Safety Officer']}><Trips /></AuthGuard>} />
           
           {/* Finance & Fuel */}
-          <Route path="fuel-logs" element={<AuthGuard allowedRoles={['Fleet Manager', 'Financial Analyst', 'Driver']}><FuelLogs /></AuthGuard>} />
-          <Route path="expenses" element={<AuthGuard allowedRoles={['Fleet Manager', 'Financial Analyst', 'Driver']}><Expenses /></AuthGuard>} />
+          <Route path="fuel-logs" element={<AuthGuard allowedRoles={['Financial Analyst']}><FuelLogs /></AuthGuard>} />
+          <Route path="expenses" element={<AuthGuard allowedRoles={['Financial Analyst']}><Expenses /></AuthGuard>} />
           
           {/* Reports & Analytics */}
-          <Route path="reports" element={<AuthGuard allowedRoles={['Fleet Manager', 'Safety Officer', 'Financial Analyst', 'Dispatcher']}><Reports /></AuthGuard>} />
+          <Route path="reports" element={<AuthGuard allowedRoles={['Fleet Manager', 'Financial Analyst']}><Reports /></AuthGuard>} />
 
           {/* Settings */}
           <Route path="/settings" element={<AuthGuard allowedRoles={['Fleet Manager']}><Settings /></AuthGuard>} />

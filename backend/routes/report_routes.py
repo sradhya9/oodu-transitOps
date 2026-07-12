@@ -4,6 +4,7 @@ from flask import Blueprint, jsonify, Response
 from sqlalchemy import text
 from backend.database import db
 from backend.database.models import MaintenanceLog, FuelLog, Expense
+from backend.middleware.auth import authenticate, authorize
 
 report_bp = Blueprint('reports', __name__, url_prefix='/reports')
 
@@ -20,6 +21,8 @@ def generate_csv_response(headers, rows, filename):
 
 # GET /reports/dashboard
 @report_bp.route('/dashboard', methods=['GET'])
+@authenticate()
+@authorize(roles=['Fleet Manager', 'Financial Analyst'])
 def get_dashboard_summary():
     try:
         # TODO: Once Vehicle ORM model is implemented, query the actual total vehicles count:
@@ -69,6 +72,8 @@ def get_dashboard_summary():
 
 # GET /reports/fuel-efficiency
 @report_bp.route('/fuel-efficiency', methods=['GET'])
+@authenticate()
+@authorize(roles=['Fleet Manager', 'Financial Analyst'])
 def get_fuel_efficiency():
     try:
         # TODO: Once Vehicle ORM and Trip ORM models are available, define proper models and relationships.
@@ -117,6 +122,8 @@ def get_fuel_efficiency():
 
 # GET /reports/fleet-utilization
 @report_bp.route('/fleet-utilization', methods=['GET'])
+@authenticate()
+@authorize(roles=['Fleet Manager', 'Financial Analyst'])
 def get_fleet_utilization():
     # TODO: This calculation requires the Vehicle ORM model.
     # Once the Vehicle model is available, fleet utilization is calculated as:
@@ -131,6 +138,8 @@ def get_fleet_utilization():
 
 # GET /reports/vehicle-roi
 @report_bp.route('/vehicle-roi', methods=['GET'])
+@authenticate()
+@authorize(roles=['Fleet Manager', 'Financial Analyst'])
 def get_vehicle_roi():
     # TODO: Once Vehicle and Trip ORM models are available, query revenue from completed trips
     # and acquisition cost from vehicles to compute ROI for each vehicle:
@@ -145,6 +154,8 @@ def get_vehicle_roi():
 
 # GET /reports/operational-cost
 @report_bp.route('/operational-cost', methods=['GET'])
+@authenticate()
+@authorize(roles=['Fleet Manager', 'Financial Analyst'])
 def get_operational_cost():
     try:
         # Calculate total fuel cost
@@ -174,6 +185,8 @@ def get_operational_cost():
 
 # GET /reports/export/maintenance - Export all maintenance records as a CSV file
 @report_bp.route('/export/maintenance', methods=['GET'])
+@authenticate()
+@authorize(roles=['Fleet Manager', 'Financial Analyst'])
 def export_maintenance_csv():
     try:
         logs = MaintenanceLog.query.order_by(MaintenanceLog.id).all()
@@ -201,6 +214,8 @@ def export_maintenance_csv():
 
 # GET /reports/export/fuel - Export all fuel log records as a CSV file
 @report_bp.route('/export/fuel', methods=['GET'])
+@authenticate()
+@authorize(roles=['Fleet Manager', 'Financial Analyst'])
 def export_fuel_csv():
     try:
         logs = FuelLog.query.order_by(FuelLog.id).all()
@@ -226,6 +241,8 @@ def export_fuel_csv():
 
 # GET /reports/export/expenses - Export all expense records as a CSV file
 @report_bp.route('/export/expenses', methods=['GET'])
+@authenticate()
+@authorize(roles=['Fleet Manager', 'Financial Analyst'])
 def export_expenses_csv():
     try:
         expenses = Expense.query.order_by(Expense.id).all()
@@ -251,6 +268,8 @@ def export_expenses_csv():
 
 # GET /reports/export/operational-cost - Export operational cost summary as a CSV file
 @report_bp.route('/export/operational-cost', methods=['GET'])
+@authenticate()
+@authorize(roles=['Fleet Manager', 'Financial Analyst'])
 def export_operational_cost_csv():
     try:
         fuel_cost = db.session.query(db.func.sum(FuelLog.fuel_cost)).scalar() or 0

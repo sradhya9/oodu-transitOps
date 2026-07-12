@@ -36,14 +36,14 @@ const MainLayout = () => {
 
   // Define all links with required roles
   const allNavLinks = [
-    { path: '/dashboard', label: 'Dashboard', icon: <LayoutDashboard size={18} strokeWidth={1.5} />, roles: ['Fleet Manager', 'Dispatcher', 'Safety Officer', 'Financial Analyst', 'Driver'] },
-    { path: '/vehicles', label: 'Fleet', icon: <Truck size={18} strokeWidth={1.5} />, roles: ['Fleet Manager', 'Dispatcher', 'Safety Officer', 'Financial Analyst'] },
-    { path: '/drivers', label: 'Drivers', icon: <Users size={18} strokeWidth={1.5} />, roles: ['Fleet Manager', 'Safety Officer', 'Dispatcher'] },
-    { path: '/trips', label: 'Trips', icon: <Route size={18} strokeWidth={1.5} />, roles: ['Fleet Manager', 'Dispatcher', 'Safety Officer', 'Financial Analyst', 'Driver'] },
+    { path: '/dashboard', label: 'Dashboard', icon: <LayoutDashboard size={18} strokeWidth={1.5} />, roles: ['Fleet Manager', 'Dispatcher', 'Safety Officer', 'Financial Analyst'] },
+    { path: '/vehicles', label: 'Fleet', icon: <Truck size={18} strokeWidth={1.5} />, roles: ['Fleet Manager', 'Dispatcher', 'Financial Analyst'] },
+    { path: '/drivers', label: 'Drivers', icon: <Users size={18} strokeWidth={1.5} />, roles: ['Fleet Manager', 'Safety Officer'] },
+    { path: '/trips', label: 'Trips', icon: <Route size={18} strokeWidth={1.5} />, roles: ['Dispatcher', 'Safety Officer'] },
     { path: '/maintenance', label: 'Maintenance', icon: <Wrench size={18} strokeWidth={1.5} />, roles: ['Fleet Manager', 'Financial Analyst'] },
-    { path: '/fuel-logs', label: 'Fuel Logs', icon: <Droplet size={18} strokeWidth={1.5} />, roles: ['Fleet Manager', 'Financial Analyst', 'Driver'] },
-    { path: '/expenses', label: 'Expenses', icon: <PieChart size={18} strokeWidth={1.5} />, roles: ['Fleet Manager', 'Financial Analyst', 'Driver'] },
-    { path: '/reports', label: 'Reports', icon: <PieChart size={18} strokeWidth={1.5} />, roles: ['Fleet Manager', 'Safety Officer', 'Financial Analyst', 'Dispatcher'] },
+    { path: '/fuel-logs', label: 'Fuel Logs', icon: <Droplet size={18} strokeWidth={1.5} />, roles: ['Financial Analyst'] },
+    { path: '/expenses', label: 'Expenses', icon: <PieChart size={18} strokeWidth={1.5} />, roles: ['Financial Analyst'] },
+    { path: '/reports', label: 'Reports', icon: <PieChart size={18} strokeWidth={1.5} />, roles: ['Fleet Manager', 'Financial Analyst'] },
     { path: '/settings', label: 'Settings', icon: <Settings size={18} strokeWidth={1.5} />, roles: ['Fleet Manager'] }
   ];
 

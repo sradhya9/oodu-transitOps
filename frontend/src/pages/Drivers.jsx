@@ -13,7 +13,8 @@ const Drivers = () => {
   const [loading, setLoading] = useState(false);
   const { user } = useContext(AuthContext);
   const role = user?.role || '';
-  const canEdit = role === 'Fleet Manager' || role === 'Dispatcher' || role === 'System Admin';
+  const canAdd = role === 'Fleet Manager';
+  const canEdit = role === 'Fleet Manager' || role === 'Safety Officer';
 
   // Filters
   const [search, setSearch] = useState("");
@@ -189,7 +190,7 @@ const Drivers = () => {
           <h1>Driver Management</h1>
           <p>Manage all fleet drivers</p>
         </div>
-        {canEdit && (
+        {canAdd && (
           <button className="add-btn" onClick={() => openModal("add")}>
             <Plus size={18} strokeWidth={2.5} /> Add Driver
           </button>
@@ -253,7 +254,7 @@ const Drivers = () => {
         ) : drivers.length === 0 ? (
           <div className="empty-state">
             <p>No drivers found.</p>
-            {canEdit && (
+            {canAdd && (
               <button className="add-btn" style={{marginTop: '16px'}} onClick={() => openModal('add')}>
                 <Plus size={18} strokeWidth={2.5} /> Add Driver
               </button>

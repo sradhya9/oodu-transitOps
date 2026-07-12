@@ -4,6 +4,7 @@ from sqlalchemy import or_, desc, asc
 from sqlalchemy.exc import IntegrityError
 from backend.database import db
 from backend.database.models import Vehicle
+from backend.middleware.auth import authenticate, authorize
 
 vehicle_bp = Blueprint('vehicles', __name__, url_prefix='/api/vehicles')
 
@@ -24,6 +25,8 @@ def serialize_vehicle(vehicle):
     }
 
 @vehicle_bp.route('', methods=['GET'])
+@authenticate()
+@authorize(roles=['Fleet Manager', 'Dispatcher', 'Financial Analyst'])
 def get_vehicles():
     try:
         # Pagination parameters
@@ -106,6 +109,8 @@ def get_vehicles():
         }), 500
 
 @vehicle_bp.route('/available', methods=['GET'])
+@authenticate()
+@authorize(roles=['Fleet Manager', 'Dispatcher', 'Financial Analyst'])
 def get_available_vehicles():
     try:
         vehicles = db.session.query(Vehicle).filter(Vehicle.status == 'Available').all()
@@ -122,6 +127,8 @@ def get_available_vehicles():
         }), 500
 
 @vehicle_bp.route('/<int:id>', methods=['GET'])
+@authenticate()
+@authorize(roles=['Fleet Manager', 'Dispatcher', 'Financial Analyst'])
 def get_vehicle(id):
     try:
         vehicle = db.session.get(Vehicle, id)
@@ -183,6 +190,8 @@ def validate_vehicle_data(data):
     return errors
 
 @vehicle_bp.route('', methods=['POST'])
+@authenticate()
+@authorize(roles=['Fleet Manager'])
 def create_vehicle():
     data = request.json
     
@@ -231,6 +240,8 @@ def create_vehicle():
         return jsonify({"success": False, "message": "Failed to create vehicle"}), 500
 
 @vehicle_bp.route('/<int:id>', methods=['PUT'])
+@authenticate()
+@authorize(roles=['Fleet Manager'])
 def update_vehicle(id):
     vehicle = db.session.get(Vehicle, id)
     if not vehicle:
@@ -289,6 +300,8 @@ def update_vehicle(id):
         return jsonify({"success": False, "message": "Failed to update vehicle"}), 500
 
 @vehicle_bp.route('/<int:id>', methods=['DELETE'])
+@authenticate()
+@authorize(roles=['Fleet Manager'])
 def delete_vehicle(id):
     vehicle = db.session.get(Vehicle, id)
     if not vehicle:

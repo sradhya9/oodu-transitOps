@@ -22,7 +22,7 @@ def generate_mock_data():
         db.create_all()
 
         print("Creating Roles...")
-        roles = ['Fleet Manager', 'Dispatcher', 'Safety Officer', 'Financial Analyst', 'Driver']
+        roles = ['Fleet Manager', 'Dispatcher', 'Safety Officer', 'Financial Analyst']
         role_objs = {}
         for r_name in roles:
             role = Role(role_name=r_name)
@@ -94,26 +94,15 @@ def generate_mock_data():
         print("Creating Drivers...")
         drivers = []
         driver_statuses = ['Available', 'Available', 'On Trip', 'Off Duty']
-        driver_role = role_objs['Driver']
         
         driver_first_names = ["Karan", "Manish", "Sunil", "Rajiv", "Deepak", "Anil", "Suresh", "Manoj", "Ajay", "Vijay", "Mukesh", "Rakesh", "Ganesh", "Santosh", "Prakash", "Dinesh", "Naveen", "Ashok", "Sandeep", "Vinod", "Harish", "Pramod", "Nitin", "Yogesh", "Kamlesh"]
         driver_last_names = ["Singh", "Kumar", "Yadav", "Sharma", "Patel", "Mishra", "Chauhan", "Rajput", "Gupta", "Das"]
 
         for i in range(1, 26):
             full_name = f"{random.choice(driver_first_names)} {random.choice(driver_last_names)}"
-            # Create a user for the driver
-            driver_user = User(
-                full_name=full_name,
-                email=f"driver{i}@transitops.in",
-                role_id=driver_role.id
-            )
-            driver_user.set_password('password123')
-            db.session.add(driver_user)
-            db.session.flush()
-            users.append(driver_user)
 
             d = Driver(
-                user_id=driver_user.id,
+                user_id=None,
                 full_name=full_name,
                 license_number=f"DL-{random.randint(10, 99)}{random.randint(100000000, 999999999)}",
                 license_category=random.choice(['HMV', 'LMV', 'TRANS']),
@@ -130,6 +119,7 @@ def generate_mock_data():
         print("Creating Trips, Maintenance, Fuel, and Expenses...")
         fm_users = [u for u in users if u.role_id == role_objs['Fleet Manager'].id]
         dispatch_users = [u for u in users if u.role_id == role_objs['Dispatcher'].id]
+        finance_users = [u for u in users if u.role_id == role_objs['Financial Analyst'].id]
         
         cities = ['Mumbai, MH', 'Delhi, DL', 'Bengaluru, KA', 'Chennai, TN', 'Pune, MH', 'Hyderabad, TS', 'Ahmedabad, GJ', 'Kolkata, WB', 'Jaipur, RJ', 'Surat, GJ']
         
@@ -208,8 +198,8 @@ def generate_mock_data():
                     fuel_cost=fuel_cost,
                     fuel_date=date.today() - timedelta(days=random.randint(1, 30)),
                     odometer=float(v.odometer) + float(planned_dist) * random.random(),
-                    # Fuel is typically logged by the driver
-                    created_by=d.user_id
+                    # Fuel is typically logged by the Financial Analyst or Dispatcher now
+                    created_by=random.choice(finance_users).id
                 )
                 db.session.add(f)
                 
@@ -221,7 +211,7 @@ def generate_mock_data():
                     amount=fuel_cost,
                     description=f"Diesel refill at {source} highway",
                     expense_date=f.fuel_date,
-                    created_by=d.user_id
+                    created_by=random.choice(finance_users).id
                 )
                 db.session.add(e_fuel)
                 
@@ -235,7 +225,7 @@ def generate_mock_data():
                         amount=toll_cost,
                         description="NHAI FASTag Toll Charges",
                         expense_date=f.fuel_date,
-                        created_by=d.user_id
+                        created_by=random.choice(finance_users).id
                     )
                     db.session.add(e_toll)
                 
@@ -254,7 +244,7 @@ def generate_mock_data():
         finance_users = [u for u in users if u.role_id == role_objs['Financial Analyst'].id]
         print("Financial Analyst:", finance_users[0].email)
         
-        print("Driver:", f"driver1@transitops.in")
+        print("Financial Analyst:", finance_users[0].email)
 
 if __name__ == '__main__':
     generate_mock_data()

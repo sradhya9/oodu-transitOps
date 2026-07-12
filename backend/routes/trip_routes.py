@@ -2,10 +2,13 @@ from flask import Blueprint, request, jsonify
 from datetime import datetime
 from sqlalchemy import or_, desc, asc
 from backend.database.models import db, Trip, Vehicle, Driver, FuelLog
+from backend.middleware.auth import authenticate, authorize
 
 trip_bp = Blueprint('trip', __name__, url_prefix='/api/trips')
 
 @trip_bp.route('', methods=['GET'])
+@authenticate()
+@authorize(roles=['Dispatcher', 'Safety Officer'])
 def get_trips():
     try:
         page = request.args.get('page', 1, type=int)
@@ -104,6 +107,8 @@ def get_trips():
 
 
 @trip_bp.route('/<int:id>', methods=['GET'])
+@authenticate()
+@authorize(roles=['Dispatcher', 'Safety Officer'])
 def get_trip(id):
     try:
         t = Trip.query.get(id)
@@ -133,6 +138,8 @@ def get_trip(id):
 
 
 @trip_bp.route('', methods=['POST'])
+@authenticate()
+@authorize(roles=['Dispatcher'])
 def create_trip():
     try:
         data = request.json
@@ -185,6 +192,8 @@ def create_trip():
 
 
 @trip_bp.route('/<int:id>/dispatch', methods=['PUT'])
+@authenticate()
+@authorize(roles=['Dispatcher'])
 def dispatch_trip(id):
     try:
         trip = Trip.query.get(id)
@@ -220,6 +229,8 @@ def dispatch_trip(id):
 
 
 @trip_bp.route('/<int:id>/complete', methods=['PUT'])
+@authenticate()
+@authorize(roles=['Dispatcher'])
 def complete_trip(id):
     try:
         trip = Trip.query.get(id)
@@ -274,6 +285,8 @@ def complete_trip(id):
 
 
 @trip_bp.route('/<int:id>/cancel', methods=['PUT'])
+@authenticate()
+@authorize(roles=['Dispatcher'])
 def cancel_trip(id):
     try:
         trip = Trip.query.get(id)
