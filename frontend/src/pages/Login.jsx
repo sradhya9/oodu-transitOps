@@ -140,7 +140,7 @@ const Login = () => {
           </p>
         </div>
 
-        <div style={{ zIndex: 1 }}>
+        {/*<div style={{ zIndex: 1 }}>
           <h3 style={{ fontSize: '1.2rem', fontWeight: '500', marginBottom: '20px', color: '#E4EEF0' }}>
             One login, four roles:
           </h3>
@@ -152,7 +152,7 @@ const Login = () => {
               </li>
             ))}
           </ul>
-        </div>
+        </div>*/}
 
         <div style={{ zIndex: 1, color: '#6B7280', fontSize: '0.8rem', letterSpacing: '1px' }}>
           TRANSITOPS © 2026 · RBAC ENABLED · BY UrFlow
@@ -226,7 +226,7 @@ const Login = () => {
                   }}
                   onFocus={(e) => e.target.style.borderColor = 'var(--c-deep-sea, #075056)'}
                   onBlur={(e) => e.target.style.borderColor = '#D1D5DB'}
-                  placeholder="admin@transitops.com"
+                  placeholder="admin@transitops.in"
                 />
               </div>
 

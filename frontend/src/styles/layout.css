@@ -24,7 +24,7 @@
   --shadow-apple: 0 4px 24px -6px rgba(15, 23, 42, 0.08), 0 0 1px rgba(15, 23, 42, 0.05);
   --shadow-sm: 0 2px 8px -2px rgba(15, 23, 42, 0.05);
 
-  --sidebar-width: 260px;
+  --sidebar-width: 240px;
   --header-height: 72px;
   /* Slightly taller for breathing room */
   --radius-card: 20px;
@@ -172,9 +172,21 @@ body {
   flex: 1;
 }
 
+.search-wrapper {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.search-icon {
+  position: absolute;
+  left: 12px;
+  color: var(--text-muted);
+}
+
 .search-input {
   width: 320px;
-  padding: 10px 16px;
+  padding: 10px 16px 10px 36px;
   border: 1px solid var(--border-color);
   border-radius: var(--radius-btn);
   background-color: var(--bg-card);
@@ -359,18 +371,20 @@ body {
     flex-direction: column;
     align-items: flex-start;
   }
-  
-  .filters-row > div {
+
+  .filters-row>div {
     flex-wrap: wrap;
     width: 100%;
   }
 
-  .data-table-container, .recent-trips-section, .reports-grid {
+  .data-table-container,
+  .recent-trips-section,
+  .reports-grid {
     overflow-x: auto;
     -webkit-overflow-scrolling: touch;
     width: 100%;
   }
-  
+
   .modal-container {
     width: 95%;
     padding: 20px;
@@ -380,7 +394,9 @@ body {
 /* ===============================
    Unified Button System
    =============================== */
-.btn-primary, .add-btn, .btn-submit {
+.btn-primary,
+.add-btn,
+.btn-submit {
   background-color: var(--accent-color);
   color: white;
   border: none;
@@ -396,13 +412,16 @@ body {
   justify-content: center;
 }
 
-.btn-primary:hover, .add-btn:hover, .btn-submit:hover {
+.btn-primary:hover,
+.add-btn:hover,
+.btn-submit:hover {
   background-color: #E04A00;
   transform: translateY(-2px);
   box-shadow: 0 6px 16px rgba(255, 91, 4, 0.35);
 }
 
-.btn-secondary, .btn-cancel {
+.btn-secondary,
+.btn-cancel {
   background-color: var(--bg-main);
   color: var(--text-primary);
   border: 1px solid var(--border-color);
@@ -417,12 +436,14 @@ body {
   justify-content: center;
 }
 
-.btn-secondary:hover, .btn-cancel:hover {
+.btn-secondary:hover,
+.btn-cancel:hover {
   background-color: var(--bg-hover);
   border-color: var(--text-primary);
 }
 
-.btn-danger, .action-btn.delete {
+.btn-danger,
+.action-btn.delete {
   background-color: rgba(239, 68, 68, 0.1);
   color: #EF4444;
   border: 1px solid rgba(239, 68, 68, 0.2);
@@ -437,14 +458,17 @@ body {
   justify-content: center;
 }
 
-.btn-danger:hover, .action-btn.delete:hover {
+.btn-danger:hover,
+.action-btn.delete:hover {
   background-color: #EF4444;
   color: white;
   transform: translateY(-2px);
   box-shadow: 0 4px 12px rgba(239, 68, 68, 0.3);
 }
 
-.btn-edit, .action-btn, .action-btn:not(.delete) {
+.btn-edit,
+.action-btn,
+.action-btn:not(.delete) {
   background-color: rgba(59, 130, 246, 0.1);
   color: #3B82F6;
   border: 1px solid rgba(59, 130, 246, 0.2);
@@ -459,7 +483,8 @@ body {
   justify-content: center;
 }
 
-.btn-edit:hover, .action-btn:not(.delete):hover {
+.btn-edit:hover,
+.action-btn:not(.delete):hover {
   background-color: #3B82F6;
   color: white;
   transform: translateY(-2px);
