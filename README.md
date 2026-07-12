@@ -1,70 +1,118 @@
-# Getting Started with Create React App
+# TransitOps – Smart Transport Operations Platform
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+TransitOps is a production-ready full-stack web application for transport operations management. This project serves as the foundation for the application, featuring a React frontend powered by Vite and a Python Flask backend connected to a MySQL database.
 
-## Available Scripts
+## Technology Stack
 
-In the project directory, you can run:
+- **Frontend**: React JS with Vite, React Router DOM, Axios, React Context API, Plain CSS.
+- **Backend**: Python 3.x, Flask, Flask-CORS, Flask-SQLAlchemy, Flask-Migrate, PyMySQL, python-dotenv.
+- **Database**: MySQL 8.x.
 
-### `npm start`
+## Folder Structure
 
-Runs the app in the development mode.\
-Open [http://localhost:3000](http://localhost:3000) to view it in your browser.
+```
+transitops/
+├── frontend/          # React/Vite application
+│   ├── src/
+│   │   ├── assets/    # Static assets (images, icons)
+│   │   ├── components/# Reusable UI components
+│   │   ├── context/   # React Context API
+│   │   ├── hooks/     # Custom React hooks
+│   │   ├── layouts/   # Page layouts (e.g., MainLayout)
+│   │   ├── pages/     # Application pages
+│   │   ├── routes/    # React Router configuration
+│   │   ├── services/  # API services (Axios config)
+│   │   ├── styles/    # Plain CSS styles
+│   │   └── utilities/ # Helper functions
+│   └── ...
+├── backend/           # Flask application
+│   ├── config/        # Environment and app configuration
+│   ├── controllers/   # Route handlers / business logic
+│   ├── database/      # Database initialization
+│   ├── middleware/    # Custom Flask middleware
+│   ├── models/        # SQLAlchemy models
+│   ├── routes/        # Flask blueprints and routing
+│   ├── services/      # Backend services
+│   └── utils/         # Helper functions
+└── ...
+```
 
-The page will reload when you make changes.\
-You may also see any lint errors in the console.
+## Prerequisites
 
-### `npm test`
+- **Node.js**: v18+
+- **Python**: v3.10+
+- **MySQL**: v8.x
 
-Launches the test runner in the interactive watch mode.\
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
+## Setup Instructions
 
-### `npm run build`
+### 1. Database Setup
 
-Builds the app for production to the `build` folder.\
-It correctly bundles React in production mode and optimizes the build for the best performance.
+Ensure MySQL is running on your machine.
+Log into your MySQL console and create the database manually:
+```sql
+CREATE DATABASE transitops;
+```
+*(Do not create any tables, migrations will handle that later.)*
 
-The build is minified and the filenames include the hashes.\
-Your app is ready to be deployed!
+### 2. Backend Setup (Flask)
 
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
+1. Navigate to the backend directory:
+   ```bash
+   cd backend
+   ```
+2. Create and activate a Python virtual environment:
+   ```bash
+   # Windows
+   python -m venv venv
+   .\venv\Scripts\activate
+   
+   # macOS/Linux
+   python3 -m venv venv
+   source venv/bin/activate
+   ```
+3. Install dependencies:
+   ```bash
+   pip install -r requirements.txt
+   ```
+4. Configure the environment variables:
+   - Copy `.env.example` to `.env`
+   - Update `.env` with your local MySQL credentials:
+     ```env
+     DB_HOST=localhost
+     DB_PORT=3306
+     DB_NAME=transitops
+     DB_USER=your_username
+     DB_PASSWORD=your_password
+     SECRET_KEY=your_secret_key
+     ```
+5. Initialize Flask-Migrate (Optional for now as models are not created yet):
+   ```bash
+   flask db init
+   ```
+6. Run the Flask development server:
+   ```bash
+   flask run
+   ```
+   *You should see "Connected to MySQL Successfully" in the terminal output.*
 
-### `npm run eject`
+### 3. Frontend Setup (React/Vite)
 
-**Note: this is a one-way operation. Once you `eject`, you can't go back!**
+1. Navigate to the frontend directory:
+   ```bash
+   cd frontend
+   ```
+2. Install dependencies:
+   ```bash
+   npm install
+   ```
+3. Run the Vite development server:
+   ```bash
+   npm run dev
+   ```
 
-If you aren't satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
+## Verification
 
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you're on your own.
-
-You don't have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn't feel obligated to use this feature. However we understand that this tool wouldn't be useful if you couldn't customize it when you are ready for it.
-
-## Learn More
-
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
-
-To learn React, check out the [React documentation](https://reactjs.org/).
-
-### Code Splitting
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/code-splitting](https://facebook.github.io/create-react-app/docs/code-splitting)
-
-### Analyzing the Bundle Size
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size](https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size)
-
-### Making a Progressive Web App
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app](https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app)
-
-### Advanced Configuration
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/advanced-configuration](https://facebook.github.io/create-react-app/docs/advanced-configuration)
-
-### Deployment
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/deployment](https://facebook.github.io/create-react-app/docs/deployment)
-
-### `npm run build` fails to minify
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify](https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify)
+To verify the setup:
+1. Ensure both backend and frontend servers are running.
+2. Visit the frontend URL (typically `http://localhost:5173`).
+3. On the Dashboard page, you should see indicators confirming that the Backend Status is "OK" and the Database is "Connected".
