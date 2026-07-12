@@ -5,6 +5,7 @@ from sqlalchemy.exc import IntegrityError
 from backend.database import db
 from backend.database.models import Vehicle
 from backend.middleware.auth import authenticate, authorize
+from backend.utils.role_filters import get_allowed_dispatch_group_ids
 
 vehicle_bp = Blueprint('vehicles', __name__, url_prefix='/api/vehicles')
 
@@ -43,7 +44,13 @@ def get_vehicles():
         sort_by = request.args.get('sortBy', 'id')
         sort_order = request.args.get('sortOrder', 'asc')
 
+        from flask import g
         query = db.session.query(Vehicle)
+
+        # Apply role-based filtering
+        allowed_group_ids = get_allowed_dispatch_group_ids(g.current_user)
+        if allowed_group_ids is not None:
+            query = query.filter(Vehicle.dispatch_group_id.in_(allowed_group_ids))
 
         # Apply Search
         if search:
@@ -113,7 +120,14 @@ def get_vehicles():
 @authorize(roles=['Fleet Manager', 'Dispatcher', 'Financial Analyst'])
 def get_available_vehicles():
     try:
-        vehicles = db.session.query(Vehicle).filter(Vehicle.status == 'Available').all()
+        from flask import g
+        query = db.session.query(Vehicle).filter(Vehicle.status == 'Available')
+        
+        allowed_group_ids = get_allowed_dispatch_group_ids(g.current_user)
+        if allowed_group_ids is not None:
+            query = query.filter(Vehicle.dispatch_group_id.in_(allowed_group_ids))
+            
+        vehicles = query.all()
         return jsonify({
             "success": True,
             "message": "Available vehicles retrieved successfully",
@@ -131,9 +145,14 @@ def get_available_vehicles():
 @authorize(roles=['Fleet Manager', 'Dispatcher', 'Financial Analyst'])
 def get_vehicle(id):
     try:
+        from flask import g
         vehicle = db.session.get(Vehicle, id)
         if not vehicle:
             return jsonify({"success": False, "message": "Vehicle not found"}), 404
+            
+        allowed_group_ids = get_allowed_dispatch_group_ids(g.current_user)
+        if allowed_group_ids is not None and vehicle.dispatch_group_id not in allowed_group_ids:
+            return jsonify({"success": False, "message": "You do not have permission to view this vehicle"}), 403
         
         return jsonify({
             "success": True,

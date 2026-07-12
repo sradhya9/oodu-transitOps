@@ -94,7 +94,7 @@ def generate_mock_data():
             {"model": "Tata Prima 5530.S", "type": "Trailer", "capacity": 40000, "cost": 5500000},
         ]
         
-        statuses = ['Available', 'Available', 'Available', 'On Trip', 'On Trip', 'In Shop']
+        statuses = ['Available', 'Available', 'Available', 'On Trip', 'On Trip', 'In Shop', 'Retired']
         
         for i in range(1, 26):
             v_model = random.choice(vehicle_models)
@@ -115,7 +115,7 @@ def generate_mock_data():
 
         print("Creating Drivers...")
         drivers = []
-        driver_statuses = ['Available', 'Available', 'On Trip', 'Off Duty']
+        driver_statuses = ['Available', 'Available', 'On Trip', 'Off Duty', 'Suspended']
         driver_role = role_objs['Driver']
         
         driver_first_names = ["Karan", "Manish", "Sunil", "Rajiv", "Deepak", "Anil", "Suresh", "Manoj", "Ajay", "Vijay", "Mukesh", "Rakesh", "Ganesh", "Santosh", "Prakash", "Dinesh", "Naveen", "Ashok", "Sandeep", "Vinod", "Harish", "Pramod", "Nitin", "Yogesh", "Kamlesh"]
@@ -135,16 +135,31 @@ def generate_mock_data():
             db.session.flush()
             users.append(driver_user)
 
+            safety_score = random.uniform(70, 100)
+            license_expiry = date.today() + timedelta(days=random.randint(100, 1500))
+            
+            # Force edge cases on specific iterations
+            if i == 5:
+                # Force suspended driver with low safety score
+                safety_score = random.uniform(20, 45)
+                driver_statuses_choice = 'Suspended'
+            elif i == 10:
+                # Force expired license
+                license_expiry = date.today() - timedelta(days=random.randint(10, 100))
+                driver_statuses_choice = 'Off Duty'
+            else:
+                driver_statuses_choice = random.choice(driver_statuses)
+
             d = Driver(
                 user_id=driver_user.id,
                 full_name=full_name,
                 license_number=f"DL-{random.randint(10, 99)}{random.randint(100000000, 999999999)}",
                 license_category=random.choice(['HMV', 'LMV', 'TRANS']),
-                license_expiry=date.today() + timedelta(days=random.randint(100, 1500)),
+                license_expiry=license_expiry,
                 contact_number=f"+91 {random.randint(70000, 99999)}{random.randint(10000, 99999)}",
-                safety_score=random.uniform(70, 100),
+                safety_score=safety_score,
                 joining_date=date.today() - timedelta(days=random.randint(50, 1000)),
-                status=random.choice(driver_statuses),
+                status=driver_statuses_choice,
                 dispatch_group_id=random.choice(dispatch_groups).id
             )
             db.session.add(d)
@@ -155,7 +170,11 @@ def generate_mock_data():
         
         cities = ['Mumbai, MH', 'Delhi, DL', 'Bengaluru, KA', 'Chennai, TN', 'Pune, MH', 'Hyderabad, TS', 'Ahmedabad, GJ', 'Kolkata, WB', 'Jaipur, RJ', 'Surat, GJ']
         
-        for i in range(1, 61):
+        for i in range(1, 181):
+            # Generate a random date in the last 180 days
+            days_ago = random.randint(1, 180)
+            base_date = datetime.utcnow() - timedelta(days=days_ago)
+            
             # Trips
             v = random.choice(vehicles)
             d = random.choice(drivers)
@@ -182,7 +201,10 @@ def generate_mock_data():
                 actual_distance=planned_dist * random.uniform(0.95, 1.05) if status == 'Completed' else None,
                 revenue=revenue,
                 status=status,
-                created_by=creator.id
+                created_by=creator.id,
+                created_at=base_date,
+                dispatch_time=base_date + timedelta(hours=random.randint(1, 4)) if status in ['Completed', 'Dispatched'] else None,
+                completion_time=base_date + timedelta(hours=random.randint(24, 96)) if status == 'Completed' else None
             )
             db.session.add(trip)
             db.session.flush() # get trip id
@@ -197,10 +219,11 @@ def generate_mock_data():
                     description=f"Routine maintenance and repairs at local workshop for {v.registration_number}",
                     workshop=random.choice(["TATA Motors Authorized Service", "Ashok Leyland Service Center", "Highway Truck Repair", "City Auto Garage"]),
                     maintenance_cost=m_cost,
-                    start_date=date.today() - timedelta(days=random.randint(1, 60)),
-                    end_date=date.today() - timedelta(days=random.randint(0, 5)),
+                    start_date=base_date.date() - timedelta(days=random.randint(1, 10)),
+                    end_date=base_date.date() + timedelta(days=random.randint(1, 5)),
                     status='Completed',
-                    created_by=random.choice(fm_users).id
+                    created_by=random.choice(fm_users).id,
+                    created_at=base_date
                 )
                 db.session.add(m)
                 
@@ -211,7 +234,8 @@ def generate_mock_data():
                     amount=m_cost,
                     description="Maintenance & Repair cost",
                     expense_date=m.start_date,
-                    created_by=random.choice(fm_users).id
+                    created_by=random.choice(fm_users).id,
+                    created_at=base_date
                 )
                 db.session.add(e)
 
@@ -228,10 +252,10 @@ def generate_mock_data():
                     trip_id=trip.id,
                     liters=liters,
                     fuel_cost=fuel_cost,
-                    fuel_date=date.today() - timedelta(days=random.randint(1, 30)),
+                    fuel_date=(base_date + timedelta(hours=random.randint(5, 20))).date(),
                     odometer=float(v.odometer) + float(planned_dist) * random.random(),
-                    # Fuel is typically logged by the Financial Analyst or Dispatcher now
-                    created_by=random.choice(finance_users).id
+                    created_by=random.choice(finance_users).id,
+                    created_at=base_date
                 )
                 db.session.add(f)
                 
@@ -243,7 +267,8 @@ def generate_mock_data():
                     amount=fuel_cost,
                     description=f"Diesel refill at {source} highway",
                     expense_date=f.fuel_date,
-                    created_by=random.choice(finance_users).id
+                    created_by=random.choice(finance_users).id,
+                    created_at=base_date
                 )
                 db.session.add(e_fuel)
                 
@@ -257,7 +282,8 @@ def generate_mock_data():
                         amount=toll_cost,
                         description="NHAI FASTag Toll Charges",
                         expense_date=f.fuel_date,
-                        created_by=random.choice(finance_users).id
+                        created_by=random.choice(finance_users).id,
+                        created_at=base_date
                     )
                     db.session.add(e_toll)
                 

@@ -4,6 +4,7 @@ from sqlalchemy import or_, desc, asc
 from sqlalchemy.exc import IntegrityError
 from backend.database.models import db, Driver
 from backend.middleware.auth import authenticate, authorize
+from backend.utils.role_filters import get_allowed_dispatch_group_ids
 
 driver_bp = Blueprint('driver', __name__, url_prefix='/api/drivers')
 
@@ -26,7 +27,13 @@ def get_drivers():
         sort_by = request.args.get('sort_by', 'created_at')
         sort_dir = request.args.get('sort_dir', 'desc')
         
+        from flask import g
         query = Driver.query
+        
+        # Apply role-based filtering
+        allowed_group_ids = get_allowed_dispatch_group_ids(g.current_user)
+        if allowed_group_ids is not None:
+            query = query.filter(Driver.dispatch_group_id.in_(allowed_group_ids))
         
         # Apply search
         if search:
@@ -108,12 +115,19 @@ def get_drivers():
 @authorize(roles=['Fleet Manager', 'Safety Officer'])
 def get_available_drivers():
     try:
+        from flask import g
         # Filter: Status=Available, Not Suspended, License Valid
         today = datetime.utcnow().date()
-        drivers = Driver.query.filter(
+        query = Driver.query.filter(
             Driver.status == 'Available',
             Driver.license_expiry >= today
-        ).all()
+        )
+        
+        allowed_group_ids = get_allowed_dispatch_group_ids(g.current_user)
+        if allowed_group_ids is not None:
+            query = query.filter(Driver.dispatch_group_id.in_(allowed_group_ids))
+            
+        drivers = query.all()
         
         drivers_list = [{
             'id': d.id,
@@ -133,9 +147,14 @@ def get_available_drivers():
 @authorize(roles=['Fleet Manager', 'Safety Officer'])
 def get_driver(id):
     try:
+        from flask import g
         driver = Driver.query.get(id)
         if not driver:
             return jsonify({'success': False, 'message': 'Driver not found'}), 404
+            
+        allowed_group_ids = get_allowed_dispatch_group_ids(g.current_user)
+        if allowed_group_ids is not None and driver.dispatch_group_id not in allowed_group_ids:
+            return jsonify({"success": False, "message": "You do not have permission to view this driver"}), 403
             
         data = {
             'id': driver.id,

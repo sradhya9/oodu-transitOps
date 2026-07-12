@@ -33,10 +33,21 @@ def parse_date(date_str):
 @authorize(roles=['Financial Analyst', 'Driver'])
 def get_all_fuel_logs():
     try:
+        from backend.utils.role_filters import get_driver_profile_id
+        from backend.database.models import Trip
+        from sqlalchemy import or_
+        
         user = g.current_user
         query = FuelLog.query
-        if user.role.role_name == 'Driver':
-            query = query.filter(FuelLog.created_by == user.id)
+        
+        driver_id_filter = get_driver_profile_id(user)
+        if driver_id_filter is not None:
+            query = query.outerjoin(Trip).filter(
+                or_(
+                    FuelLog.created_by == user.id,
+                    Trip.driver_id == driver_id_filter
+                )
+            )
             
         logs = query.order_by(FuelLog.created_at.desc(), FuelLog.id.desc()).all()
         return jsonify([serialize_fuel(log) for log in logs]), 200

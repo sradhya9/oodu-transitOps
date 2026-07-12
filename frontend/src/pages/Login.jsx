@@ -11,11 +11,11 @@ const Login = () => {
   const [specialCode, setSpecialCode] = useState('');
   const [emailedCode, setEmailedCode] = useState('');
   const [showPassword, setShowPassword] = useState(false);
-  
+
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
   const [loading, setLoading] = useState(false);
-  
+
   const { login } = useContext(AuthContext);
   const navigate = useNavigate();
 
@@ -23,7 +23,7 @@ const Login = () => {
     e.preventDefault();
     setError('');
     setSuccess('');
-    
+
     if (!email || !password) {
       setError('Email and password are required.');
       return;
@@ -44,12 +44,12 @@ const Login = () => {
     e.preventDefault();
     setError('');
     setSuccess('');
-    
+
     if (!email) {
       setError('Please enter your email to request a reset.');
       return;
     }
-    
+
     setLoading(true);
     try {
       const response = await api.post('/api/auth/forgot-password', { email });
@@ -67,19 +67,19 @@ const Login = () => {
     e.preventDefault();
     setError('');
     setSuccess('');
-    
+
     if (!email || !specialCode || !emailedCode || !password) {
       setError('All fields are required.');
       return;
     }
-    
+
     setLoading(true);
     try {
-      const response = await api.post('/api/auth/reset-password', { 
-        email, 
-        special_access_code: specialCode, 
-        emailed_code: emailedCode, 
-        new_password: password 
+      const response = await api.post('/api/auth/reset-password', {
+        email,
+        special_access_code: specialCode,
+        emailed_code: emailedCode,
+        new_password: password
       });
       setSuccess(response.data.message);
       setTimeout(() => {
@@ -96,7 +96,7 @@ const Login = () => {
 
   return (
     <div style={{ display: 'flex', minHeight: '100vh', width: '100%', fontFamily: "'Inter', sans-serif" }}>
-      
+
       {/* Left Pane (Dark) */}
       <div style={{
         flex: 1,
@@ -120,12 +120,12 @@ const Login = () => {
           background: 'radial-gradient(circle, rgba(7,80,86,0.4) 0%, rgba(22,35,42,0) 70%)',
           zIndex: 0
         }} />
-        
+
         <div style={{ zIndex: 1 }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '16px' }}>
-            <div style={{ 
-              width: '40px', height: '40px', 
-              backgroundColor: 'var(--c-kimchi, #FF5B04)', 
+            <div style={{
+              width: '40px', height: '40px',
+              backgroundColor: 'var(--c-kimchi, #FF5B04)',
               borderRadius: '8px',
               display: 'flex', alignItems: 'center', justifyContent: 'center'
             }}>
@@ -153,9 +153,9 @@ const Login = () => {
             ))}
           </ul>
         </div>
-        
+
         <div style={{ zIndex: 1, color: '#6B7280', fontSize: '0.8rem', letterSpacing: '1px' }}>
-          TRANSITOPS © 2026 · RBAC ENABLED
+          TRANSITOPS © 2026 · RBAC ENABLED · BY UrFlow
         </div>
       </div>
 
@@ -216,12 +216,12 @@ const Login = () => {
                 <label style={{ display: 'block', fontSize: '0.8rem', fontWeight: '600', color: '#6B7280', marginBottom: '6px', textTransform: 'uppercase' }}>
                   Email
                 </label>
-                <input 
+                <input
                   type="email"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
-                  style={{ 
-                    width: '100%', padding: '12px 16px', borderRadius: '8px', 
+                  style={{
+                    width: '100%', padding: '12px 16px', borderRadius: '8px',
                     border: '1px solid #D1D5DB', fontSize: '1rem', outline: 'none', transition: 'border-color 0.2s'
                   }}
                   onFocus={(e) => e.target.style.borderColor = 'var(--c-deep-sea, #075056)'}
@@ -229,25 +229,25 @@ const Login = () => {
                   placeholder="admin@transitops.com"
                 />
               </div>
-              
+
               <div>
                 <label style={{ display: 'block', fontSize: '0.8rem', fontWeight: '600', color: '#6B7280', marginBottom: '6px', textTransform: 'uppercase' }}>
                   Password
                 </label>
                 <div style={{ position: 'relative' }}>
-                  <input 
+                  <input
                     type={showPassword ? 'text' : 'password'}
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
-                    style={{ 
-                      width: '100%', padding: '12px 40px 12px 16px', borderRadius: '8px', 
+                    style={{
+                      width: '100%', padding: '12px 40px 12px 16px', borderRadius: '8px',
                       border: '1px solid #D1D5DB', fontSize: '1rem', outline: 'none', transition: 'border-color 0.2s'
                     }}
                     onFocus={(e) => e.target.style.borderColor = 'var(--c-deep-sea, #075056)'}
                     onBlur={(e) => e.target.style.borderColor = '#D1D5DB'}
                     placeholder="••••••••"
                   />
-                  <button 
+                  <button
                     type="button"
                     onClick={() => setShowPassword(!showPassword)}
                     style={{
@@ -270,9 +270,9 @@ const Login = () => {
                 </button>
               </div>
 
-              <button 
-                type="submit" 
-                style={{ 
+              <button
+                type="submit"
+                style={{
                   width: '100%', padding: '14px', marginTop: '8px', borderRadius: '8px',
                   backgroundColor: 'var(--c-kimchi, #FF5B04)', color: 'white', fontSize: '1rem',
                   fontWeight: '600', border: 'none', cursor: 'pointer', transition: 'background-color 0.2s',
@@ -292,21 +292,21 @@ const Login = () => {
                 <label style={{ display: 'block', fontSize: '0.8rem', fontWeight: '600', color: '#6B7280', marginBottom: '6px', textTransform: 'uppercase' }}>
                   Email Address
                 </label>
-                <input 
+                <input
                   type="email"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
-                  style={{ 
-                    width: '100%', padding: '12px 16px', borderRadius: '8px', 
+                  style={{
+                    width: '100%', padding: '12px 16px', borderRadius: '8px',
                     border: '1px solid #D1D5DB', fontSize: '1rem', outline: 'none'
                   }}
                   placeholder="Enter your email"
                 />
               </div>
 
-              <button 
-                type="submit" 
-                style={{ 
+              <button
+                type="submit"
+                style={{
                   width: '100%', padding: '14px', borderRadius: '8px',
                   backgroundColor: 'var(--c-deep-sea, #075056)', color: 'white', fontSize: '1rem',
                   fontWeight: '600', border: 'none', cursor: 'pointer', display: 'flex', justifyContent: 'center'
@@ -352,7 +352,7 @@ const Login = () => {
               <button type="submit" disabled={loading} style={{ width: '100%', padding: '14px', borderRadius: '8px', backgroundColor: 'var(--c-kimchi, #FF5B04)', color: 'white', fontSize: '1rem', fontWeight: '600', border: 'none', cursor: 'pointer', marginTop: '8px' }}>
                 {loading ? <Loader2 size={20} className="spin" /> : 'Reset Password'}
               </button>
-              
+
               <div style={{ textAlign: 'center' }}>
                 <button type="button" onClick={() => setView('login')} style={{ background: 'none', border: 'none', color: '#6B7280', fontSize: '0.9rem', cursor: 'pointer', fontWeight: '500' }}>
                   Cancel
@@ -373,7 +373,7 @@ const Login = () => {
           </div>
         </div>
       </div>
-      
+
       <style>{`
         .spin { animation: spin 1s linear infinite; }
         @keyframes spin { 100% { transform: rotate(360deg); } }

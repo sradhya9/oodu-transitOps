@@ -3,6 +3,7 @@ from datetime import datetime
 from sqlalchemy import or_, desc, asc
 from backend.database.models import db, Trip, Vehicle, Driver, FuelLog
 from backend.middleware.auth import authenticate, authorize
+from backend.utils.role_filters import get_allowed_dispatch_group_ids, get_driver_profile_id
 
 trip_bp = Blueprint('trip', __name__, url_prefix='/api/trips')
 
@@ -22,7 +23,22 @@ def get_trips():
         sort_by = request.args.get('sort_by', 'created_at')
         sort_dir = request.args.get('sort_dir', 'desc')
         
+        from flask import g
         query = Trip.query.join(Vehicle).join(Driver)
+        
+        # Apply role-based filtering
+        allowed_group_ids = get_allowed_dispatch_group_ids(g.current_user)
+        if allowed_group_ids is not None:
+            query = query.filter(
+                or_(
+                    Vehicle.dispatch_group_id.in_(allowed_group_ids),
+                    Driver.dispatch_group_id.in_(allowed_group_ids)
+                )
+            )
+            
+        driver_id_filter = get_driver_profile_id(g.current_user)
+        if driver_id_filter is not None:
+            query = query.filter(Trip.driver_id == driver_id_filter)
         
         if search:
             search_term = f"%{search}%"
@@ -111,9 +127,20 @@ def get_trips():
 @authorize(roles=['Dispatcher', 'Safety Officer'])
 def get_trip(id):
     try:
+        from flask import g
         t = Trip.query.get(id)
         if not t:
             return jsonify({'success': False, 'message': 'Trip not found'}), 404
+            
+        # Check permissions
+        allowed_group_ids = get_allowed_dispatch_group_ids(g.current_user)
+        if allowed_group_ids is not None:
+            if t.vehicle.dispatch_group_id not in allowed_group_ids:
+                return jsonify({'success': False, 'message': 'You do not have permission to view this trip'}), 403
+                
+        driver_id_filter = get_driver_profile_id(g.current_user)
+        if driver_id_filter is not None and t.driver_id != driver_id_filter:
+            return jsonify({'success': False, 'message': 'You do not have permission to view this trip'}), 403
             
         data = {
             'id': t.id,
