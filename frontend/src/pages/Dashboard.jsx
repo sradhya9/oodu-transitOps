@@ -46,10 +46,10 @@ const Dashboard = () => {
     
     const fetchDashboardData = async () => {
       try {
-        const statsResponse = await api.get('/dashboard/stats');
+        const statsResponse = await api.get('/api/dashboard/stats');
         setStats(statsResponse.data);
         
-        const tripsResponse = await api.get('/dashboard/recent-trips');
+        const tripsResponse = await api.get('/api/dashboard/recent-trips');
         setRecentTrips(tripsResponse.data);
       } catch (error) {
         console.error("Failed to fetch dashboard data:", error);

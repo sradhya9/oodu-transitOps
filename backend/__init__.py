@@ -11,6 +11,8 @@ from backend.routes.maintenance_routes import maintenance_bp
 from backend.routes.fuel_routes import fuel_bp
 from backend.routes.expense_routes import expense_bp
 from backend.routes.report_routes import report_bp
+from backend.routes.dashboard_routes import dashboard_bp
+from backend.routes.auth_routes import auth_bp
 
 def create_app(config_class=Config):
     app = Flask(__name__)
@@ -30,6 +32,8 @@ def create_app(config_class=Config):
 
     from backend.routes.vehicle_routes import vehicle_bp
     app.register_blueprint(vehicle_bp)
+    app.register_blueprint(dashboard_bp)
+    app.register_blueprint(auth_bp, url_prefix='/api/auth')
 
     # Test database connection on startup
     with app.app_context():
