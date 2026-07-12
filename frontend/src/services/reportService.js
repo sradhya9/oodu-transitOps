@@ -45,9 +45,9 @@ export const getOperationalCost = async () => {
   }
 };
 
-export const exportReportCSV = async (endpoint, filename) => {
+export const exportReportFile = async (endpoint, filename, format = 'csv') => {
   try {
-    const response = await api.get(`/reports/export/${endpoint}`, {
+    const response = await api.get(`/reports/export/${endpoint}?format=${format}`, {
       responseType: 'blob'
     });
     const url = window.URL.createObjectURL(new Blob([response.data]));

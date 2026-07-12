@@ -1,10 +1,11 @@
 import csv
 import io
-from flask import Blueprint, jsonify, Response
+from flask import Blueprint, jsonify, Response, request
 from sqlalchemy import text
 from backend.database import db
 from backend.database.models import MaintenanceLog, FuelLog, Expense, Vehicle, Trip
 from backend.middleware.auth import authenticate, authorize
+from fpdf import FPDF
 
 report_bp = Blueprint('reports', __name__, url_prefix='/reports')
 
@@ -16,6 +17,38 @@ def generate_csv_response(headers, rows, filename):
         writer.writerow(row)
     
     response = Response(output.getvalue(), mimetype='text/csv')
+    response.headers['Content-Disposition'] = f'attachment; filename={filename}'
+    return response
+
+def generate_pdf_response(headers, rows, filename, title="Report"):
+    pdf = FPDF()
+    pdf.add_page()
+    pdf.set_font("helvetica", size=16)
+    
+    # Title
+    pdf.cell(w=0, h=10, text=title, new_x="LMARGIN", new_y="NEXT", align="C")
+    pdf.ln(5)
+    
+    # Table headers
+    pdf.set_font("helvetica", style="B", size=9)
+    col_width = 190 / len(headers) if headers else 190
+    row_height = 8
+    
+    for header in headers:
+        pdf.cell(w=col_width, h=row_height, text=str(header), border=1)
+    pdf.ln(row_height)
+    
+    # Table rows
+    pdf.set_font("helvetica", size=8)
+    for row in rows:
+        for item in row:
+            text_str = str(item)[:30] if item is not None else ""
+            pdf.cell(w=col_width, h=row_height, text=text_str, border=1)
+        pdf.ln(row_height)
+        
+    pdf_bytes = bytes(pdf.output())
+    
+    response = Response(pdf_bytes, mimetype='application/pdf')
     response.headers['Content-Disposition'] = f'attachment; filename={filename}'
     return response
 
@@ -210,12 +243,13 @@ def get_operational_cost():
         return jsonify({"error": "Failed to calculate operational costs", "details": str(e)}), 500
 
 
-# GET /reports/export/maintenance - Export all maintenance records as a CSV file
+# GET /reports/export/maintenance - Export all maintenance records as a CSV or PDF file
 @report_bp.route('/export/maintenance', methods=['GET'])
 @authenticate()
 @authorize(roles=['Fleet Manager', 'Financial Analyst'])
-def export_maintenance_csv():
+def export_maintenance_report():
     try:
+        format_type = request.args.get('format', 'csv')
         logs = MaintenanceLog.query.order_by(MaintenanceLog.id).all()
         rows = []
         for log in logs:
@@ -234,17 +268,21 @@ def export_maintenance_csv():
             'Maintenance ID', 'Vehicle ID', 'Maintenance Type', 'Workshop', 
             'Description', 'Maintenance Cost', 'Start Date', 'End Date', 'Status'
         ]
+        
+        if format_type == 'pdf':
+            return generate_pdf_response(headers, rows, 'maintenance_records.pdf', 'Maintenance Report')
         return generate_csv_response(headers, rows, 'maintenance_records.csv')
     except Exception as e:
-        return jsonify({"error": "Failed to export maintenance CSV", "details": str(e)}), 500
+        return jsonify({"error": "Failed to export maintenance report", "details": str(e)}), 500
 
 
-# GET /reports/export/fuel - Export all fuel log records as a CSV file
+# GET /reports/export/fuel - Export all fuel log records as a CSV or PDF file
 @report_bp.route('/export/fuel', methods=['GET'])
 @authenticate()
 @authorize(roles=['Fleet Manager', 'Financial Analyst'])
-def export_fuel_csv():
+def export_fuel_report():
     try:
+        format_type = request.args.get('format', 'csv')
         logs = FuelLog.query.order_by(FuelLog.id).all()
         rows = []
         for log in logs:
@@ -261,17 +299,20 @@ def export_fuel_csv():
             'Fuel Log ID', 'Vehicle ID', 'Trip ID', 'Liters', 'Fuel Cost', 
             'Fuel Date', 'Odometer'
         ]
+        if format_type == 'pdf':
+            return generate_pdf_response(headers, rows, 'fuel_logs.pdf', 'Fuel Report')
         return generate_csv_response(headers, rows, 'fuel_logs.csv')
     except Exception as e:
-        return jsonify({"error": "Failed to export fuel CSV", "details": str(e)}), 500
+        return jsonify({"error": "Failed to export fuel report", "details": str(e)}), 500
 
 
-# GET /reports/export/expenses - Export all expense records as a CSV file
+# GET /reports/export/expenses - Export all expense records as a CSV or PDF file
 @report_bp.route('/export/expenses', methods=['GET'])
 @authenticate()
 @authorize(roles=['Fleet Manager', 'Financial Analyst'])
-def export_expenses_csv():
+def export_expenses_report():
     try:
+        format_type = request.args.get('format', 'csv')
         expenses = Expense.query.order_by(Expense.id).all()
         rows = []
         for exp in expenses:
@@ -288,17 +329,20 @@ def export_expenses_csv():
             'Expense ID', 'Expense Type', 'Amount', 'Description', 
             'Expense Date', 'Vehicle ID', 'Trip ID'
         ]
+        if format_type == 'pdf':
+            return generate_pdf_response(headers, rows, 'expense_records.pdf', 'Expense Report')
         return generate_csv_response(headers, rows, 'expense_records.csv')
     except Exception as e:
-        return jsonify({"error": "Failed to export expense CSV", "details": str(e)}), 500
+        return jsonify({"error": "Failed to export expense report", "details": str(e)}), 500
 
 
-# GET /reports/export/operational-cost - Export operational cost summary as a CSV file
+# GET /reports/export/operational-cost - Export operational cost summary as a CSV or PDF file
 @report_bp.route('/export/operational-cost', methods=['GET'])
 @authenticate()
 @authorize(roles=['Fleet Manager', 'Financial Analyst'])
-def export_operational_cost_csv():
+def export_operational_cost_report():
     try:
+        format_type = request.args.get('format', 'csv')
         fuel_cost = db.session.query(db.func.sum(FuelLog.fuel_cost)).scalar() or 0
         maintenance_cost = db.session.query(db.func.sum(MaintenanceLog.maintenance_cost)).scalar() or 0
         other_expenses = db.session.query(
@@ -313,7 +357,9 @@ def export_operational_cost_csv():
             grand_total
         ]]
         headers = ['Fuel Cost', 'Maintenance Cost', 'Other Expenses', 'Grand Total']
+        if format_type == 'pdf':
+            return generate_pdf_response(headers, rows, 'operational_cost_summary.pdf', 'Operational Cost Report')
         return generate_csv_response(headers, rows, 'operational_cost_summary.csv')
     except Exception as e:
-        return jsonify({"error": "Failed to export operational cost CSV", "details": str(e)}), 500
+        return jsonify({"error": "Failed to export operational cost report", "details": str(e)}), 500
 
