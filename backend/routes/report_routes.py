@@ -3,7 +3,7 @@ import io
 from flask import Blueprint, jsonify, Response
 from sqlalchemy import text
 from backend.database import db
-from backend.database.models import MaintenanceLog, FuelLog, Expense
+from backend.database.models import MaintenanceLog, FuelLog, Expense, Vehicle, Trip
 from backend.middleware.auth import authenticate, authorize
 
 report_bp = Blueprint('reports', __name__, url_prefix='/reports')
@@ -25,13 +25,11 @@ def generate_csv_response(headers, rows, filename):
 @authorize(roles=['Fleet Manager', 'Financial Analyst'])
 def get_dashboard_summary():
     try:
-        # TODO: Once Vehicle ORM model is implemented, query the actual total vehicles count:
-        # total_vehicles = Vehicle.query.count()
-        total_vehicles_placeholder = 0 
+        # Get actual total vehicles count
+        total_vehicles = Vehicle.query.filter(Vehicle.status != 'Retired').count()
         
-        # TODO: Once Trip ORM model is implemented, query the actual active trips count:
-        # active_trips = Trip.query.filter(Trip.status == 'Dispatched').count()
-        active_trips_placeholder = 0
+        # Get actual active trips count
+        active_trips = Trip.query.filter(Trip.status == 'Dispatched').count()
         
         # Calculate vehicles in shop (unique vehicle IDs with "Open" maintenance logs)
         vehicles_in_shop = db.session.query(
@@ -53,17 +51,13 @@ def get_dashboard_summary():
         total_operational_cost = float(total_fuel_cost) + float(total_maintenance_cost) + float(total_other_expenses)
         
         return jsonify({
-            "total_vehicles": total_vehicles_placeholder,
-            "active_trips": active_trips_placeholder,
+            "total_vehicles": total_vehicles,
+            "active_trips": active_trips,
             "vehicles_in_shop": vehicles_in_shop,
             "total_fuel_cost": float(total_fuel_cost),
             "total_maintenance_cost": float(total_maintenance_cost),
             "total_other_expenses": float(total_other_expenses),
-            "total_operational_cost": total_operational_cost,
-            "_notes": {
-                "total_vehicles": "Pending Vehicle ORM implementation",
-                "active_trips": "Pending Trip ORM implementation"
-            }
+            "total_operational_cost": total_operational_cost
         }), 200
         
     except Exception as e:
@@ -125,15 +119,22 @@ def get_fuel_efficiency():
 @authenticate()
 @authorize(roles=['Fleet Manager', 'Financial Analyst'])
 def get_fleet_utilization():
-    # TODO: This calculation requires the Vehicle ORM model.
-    # Once the Vehicle model is available, fleet utilization is calculated as:
-    # utilization = (Vehicle.query.filter(Vehicle.status == 'On Trip').count() / Vehicle.query.count()) * 100
-    return jsonify({
-        "message": "Vehicle integration is pending. Complete calculation once Vehicle ORM is available.",
-        "fleet_utilization": None,
-        "status": "pending_integration",
-        "_todo": "utilization = (vehicles_on_trip / total_vehicles) * 100"
-    }), 200
+    try:
+        total_vehicles = Vehicle.query.filter(Vehicle.status != 'Retired').count()
+        vehicles_on_trip = Vehicle.query.filter(Vehicle.status == 'On Trip').count()
+        
+        utilization = 0
+        if total_vehicles > 0:
+            utilization = (vehicles_on_trip / total_vehicles) * 100
+            
+        return jsonify({
+            "fleet_utilization": round(utilization, 2),
+            "total_vehicles": total_vehicles,
+            "vehicles_on_trip": vehicles_on_trip,
+            "status": "success"
+        }), 200
+    except Exception as e:
+        return jsonify({"error": "Failed to calculate fleet utilization", "details": str(e)}), 500
 
 
 # GET /reports/vehicle-roi
@@ -141,15 +142,41 @@ def get_fleet_utilization():
 @authenticate()
 @authorize(roles=['Fleet Manager', 'Financial Analyst'])
 def get_vehicle_roi():
-    # TODO: Once Vehicle and Trip ORM models are available, query revenue from completed trips
-    # and acquisition cost from vehicles to compute ROI for each vehicle:
-    # ROI = (Revenue - (MaintenanceCost + FuelCost)) / AcquisitionCost
-    return jsonify({
-        "message": "Vehicle ROI calculations are pending Vehicle and Trip ORM models availability.",
-        "roi_records": [],
-        "status": "pending_integration",
-        "_todo": "ROI = (Revenue - (Maintenance + Fuel)) / Acquisition Cost"
-    }), 200
+    try:
+        vehicles = Vehicle.query.filter(Vehicle.status != 'Retired').all()
+        roi_records = []
+        
+        for v in vehicles:
+            total_revenue = db.session.query(db.func.sum(Trip.revenue)).filter(Trip.vehicle_id == v.id, Trip.status == 'Completed').scalar() or 0
+            total_maintenance = db.session.query(db.func.sum(MaintenanceLog.maintenance_cost)).filter(MaintenanceLog.vehicle_id == v.id).scalar() or 0
+            total_fuel = db.session.query(db.func.sum(FuelLog.fuel_cost)).filter(FuelLog.vehicle_id == v.id).scalar() or 0
+            
+            acquisition_cost = float(v.acquisition_cost) if v.acquisition_cost else 0.0
+            
+            roi = 0
+            if acquisition_cost > 0:
+                roi = (float(total_revenue) - (float(total_maintenance) + float(total_fuel))) / acquisition_cost
+                roi = round(roi * 100, 2)
+                
+            roi_records.append({
+                "vehicle_id": v.id,
+                "registration_number": v.registration_number,
+                "total_revenue": float(total_revenue),
+                "total_maintenance": float(total_maintenance),
+                "total_fuel": float(total_fuel),
+                "acquisition_cost": acquisition_cost,
+                "roi_percentage": roi
+            })
+            
+        # Sort by ROI descending
+        roi_records.sort(key=lambda x: x['roi_percentage'], reverse=True)
+            
+        return jsonify({
+            "roi_records": roi_records,
+            "status": "success"
+        }), 200
+    except Exception as e:
+        return jsonify({"error": "Failed to calculate vehicle ROI", "details": str(e)}), 500
 
 
 # GET /reports/operational-cost

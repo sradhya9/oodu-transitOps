@@ -19,6 +19,10 @@ const formatCurrency = (val) => val !== null && val !== undefined
   ? `₹${val.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`
   : '₹0.00';
 
+const formatCurrencyCompact = (val) => val !== null && val !== undefined
+  ? `₹${val.toLocaleString(undefined, { notation: 'compact', maximumFractionDigits: 1 })}`
+  : '₹0';
+
 const KpiCard = ({ title, value, color }) => (
   <div className={`kpi-card ${color}`}>
     <span className="kpi-label">{title}</span>
@@ -98,15 +102,18 @@ const Reports = () => {
 
       // Process raw maintenance logs into totals grouped by vehicle_id
       const maintByVehicle = {};
+      const regByVehicle = {};
       maintenanceLogs.forEach((log) => {
         if (log.vehicle_id && log.maintenance_cost) {
           const cost = parseFloat(log.maintenance_cost);
           maintByVehicle[log.vehicle_id] = (maintByVehicle[log.vehicle_id] || 0) + cost;
+          regByVehicle[log.vehicle_id] = log.vehicle_registration || `Vehicle #${log.vehicle_id}`;
         }
       });
 
       const maintChart = Object.entries(maintByVehicle).map(([vId, cost]) => ({
         vehicle_id: vId,
+        registration_number: regByVehicle[vId],
         total_cost: cost
       }));
       maintChart.sort((a, b) => b.total_cost - a.total_cost);
@@ -148,10 +155,10 @@ const Reports = () => {
     // Custom donut pie-chart segment mapping
     const pieChartStyle = {
       background: `conic-gradient(#3B82F6 0% ${fuelPct}%, #FF5B04 ${fuelPct}% ${fuelPct + maintPct}%, #64748B ${fuelPct + maintPct}% 100%)`,
-      width: '160px',
-      height: '160px',
+      width: '120px',
+      height: '120px',
       borderRadius: '50%',
-      boxShadow: 'inset 0 0 0 24px white'
+      boxShadow: 'inset 0 0 0 16px white'
     };
 
     return {
@@ -327,174 +334,261 @@ const Reports = () => {
 
       {/* KPI Cards Panel */}
       <div className="kpi-grid">
-        {canViewFinancials && <KpiCard title="Operational Cost" value={formatCurrency(grandTotal)} color="orange" />}
-        {canViewFinancials && <KpiCard title="Fuel Cost" value={formatCurrency(fuel)} color="blue" />}
-        {canViewFinancials && <KpiCard title="Maintenance Cost" value={formatCurrency(maintenance)} color="blue" />}
-        {canViewFinancials && <KpiCard title="Other Expenses" value={formatCurrency(other)} color="blue" />}
+        {canViewFinancials && <KpiCard title="Operational Cost" value={formatCurrencyCompact(grandTotal)} color="orange" />}
+        {canViewFinancials && <KpiCard title="Fuel Cost" value={formatCurrencyCompact(fuel)} color="blue" />}
+        {canViewFinancials && <KpiCard title="Maintenance Cost" value={formatCurrencyCompact(maintenance)} color="blue" />}
+        {canViewFinancials && <KpiCard title="Other Expenses" value={formatCurrencyCompact(other)} color="blue" />}
         <KpiCard title="Vehicles In Shop" value={dashboardData?.vehicles_in_shop || 0} color="orange" />
         <KpiCard title="Active Trips" value={dashboardData?.active_trips || 0} color="blue" />
       </div>
 
       {/* Reports Analysis Details Grid */}
-      <div className="reports-grid">
-        
-        {/* Section 1: Operational Cost Table & Pie Chart */}
-        {canViewFinancials && (
-          <div className="report-section-card">
-            <h2>Operational Cost breakdown</h2>
-            <div style={{ display: 'grid', gridTemplateColumns: '1.2fr 1fr', gap: '20px', alignItems: 'center' }}>
-              <table className="trips-table">
-                <tbody>
-                  <tr>
-                    <td style={{ fontWeight: '500' }}>Fuel cost</td>
-                    <td style={{ textAlign: 'right' }}>{formatCurrency(fuel)}</td>
-                  </tr>
-                  <tr>
-                    <td style={{ fontWeight: '500' }}>Maintenance cost</td>
-                    <td style={{ textAlign: 'right' }}>{formatCurrency(maintenance)}</td>
-                  </tr>
-                  <tr>
-                    <td style={{ fontWeight: '500' }}>Other expenses</td>
-                    <td style={{ textAlign: 'right' }}>{formatCurrency(other)}</td>
-                  </tr>
-                  <tr style={{ borderTop: '2px solid var(--border-color)', fontWeight: '600' }}>
-                    <td>Grand Total</td>
-                    <td style={{ textAlign: 'right', color: 'var(--accent-color)' }}>{formatCurrency(grandTotal)}</td>
-                  </tr>
-                </tbody>
-              </table>
+      <div style={{ display: 'flex', flexDirection: 'column', gap: '24px', marginTop: '24px' }}>
+        <div className="reports-grid" style={{ marginTop: 0, alignItems: 'start' }}>
+          
+          {canViewFinancials ? (
+            <>
+              {/* Left Column */}
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
+                
+                {/* Section 1: Operational Cost Table & Pie Chart */}
+                <div className="report-section-card" style={{ width: 'fit-content' }}>
+                  <h2>Operational Cost breakdown</h2>
+                  <div style={{ display: 'grid', gridTemplateColumns: 'auto auto', gap: '40px', alignItems: 'center' }}>
+                    <table className="trips-table">
+                      <tbody>
+                        <tr>
+                          <td style={{ fontWeight: '500' }}>Fuel cost</td>
+                          <td style={{ textAlign: 'right' }}>{formatCurrency(fuel)}</td>
+                        </tr>
+                        <tr>
+                          <td style={{ fontWeight: '500' }}>Maintenance cost</td>
+                          <td style={{ textAlign: 'right' }}>{formatCurrency(maintenance)}</td>
+                        </tr>
+                        <tr>
+                          <td style={{ fontWeight: '500' }}>Other expenses</td>
+                          <td style={{ textAlign: 'right' }}>{formatCurrency(other)}</td>
+                        </tr>
+                        <tr style={{ borderTop: '2px solid var(--border-color)', fontWeight: '600' }}>
+                          <td>Grand Total</td>
+                          <td style={{ textAlign: 'right', color: 'var(--accent-color)' }}>{formatCurrency(grandTotal)}</td>
+                        </tr>
+                      </tbody>
+                    </table>
 
-              <div className="chart-wrapper">
-                {hasPieData ? (
-                  <>
-                    <div style={pieChartStyle}></div>
-                    <div className="chart-legend">
-                      <div className="legend-item">
-                        <span className="legend-color" style={{ backgroundColor: '#3B82F6' }}></span>
-                        <span>Fuel ({fuelPct.toFixed(0)}%)</span>
-                      </div>
-                      <div className="legend-item">
-                        <span className="legend-color" style={{ backgroundColor: '#FF5B04' }}></span>
-                        <span>Maint ({maintPct.toFixed(0)}%)</span>
-                      </div>
-                      <div className="legend-item">
-                        <span className="legend-color" style={{ backgroundColor: '#64748B' }}></span>
-                        <span>Other ({otherPct.toFixed(0)}%)</span>
-                      </div>
+                    <div className="chart-wrapper">
+                      {hasPieData ? (
+                        <>
+                          <div style={pieChartStyle}></div>
+                          <div className="chart-legend">
+                            <div className="legend-item">
+                              <span className="legend-color" style={{ backgroundColor: '#3B82F6' }}></span>
+                              <span>Fuel ({fuelPct.toFixed(0)}%)</span>
+                            </div>
+                            <div className="legend-item">
+                              <span className="legend-color" style={{ backgroundColor: '#FF5B04' }}></span>
+                              <span>Maint ({maintPct.toFixed(0)}%)</span>
+                            </div>
+                            <div className="legend-item">
+                              <span className="legend-color" style={{ backgroundColor: '#64748B' }}></span>
+                              <span>Other ({otherPct.toFixed(0)}%)</span>
+                            </div>
+                          </div>
+                        </>
+                      ) : (
+                        <div style={{ color: 'var(--text-muted)', fontSize: '0.85rem' }}>Insufficient cost data to render chart</div>
+                      )}
                     </div>
-                  </>
-                ) : (
-                  <div style={{ color: 'var(--text-muted)', fontSize: '0.85rem' }}>Insufficient cost data to render chart</div>
-                )}
-              </div>
-            </div>
-          </div>
-        )}
+                  </div>
+                </div>
 
-        {/* Section 2: Fuel Efficiency Table & Horizontal Bar Chart */}
-        {canViewFinancials && (
-          <div className="report-section-card">
-            <h2>Fuel Efficiency by Vehicle</h2>
-            {fuelEfficiencyData.length > 0 ? (
-              <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
-                <table className="trips-table">
-                  <thead>
-                    <tr>
-                      <th>Vehicle ID</th>
-                      <th>Registration</th>
-                      <th>Distance (km)</th>
-                      <th>Fuel (L)</th>
-                      <th style={{ textAlign: 'right' }}>Efficiency (km/L)</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {fuelEfficiencyData.map((d) => (
-                      <tr key={d.vehicle_id}>
-                        <td>#{d.vehicle_id}</td>
-                        <td>{d.registration_number || <span style={{ color: '#9CA3AF' }}>—</span>}</td>
-                        <td>{d.total_distance.toLocaleString()}</td>
-                        <td>{d.total_fuel.toLocaleString()}</td>
-                        <td style={{ textAlign: 'right', fontWeight: '600' }}>{d.fuel_efficiency.toFixed(2)}</td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
+                {/* Section 3: Maintenance Cost by Vehicle */}
+                <div className="report-section-card">
+                  <h2>Maintenance Cost by Vehicle</h2>
+                  {maintenanceChartData.length > 0 ? (
+                    <div className="bar-chart-container" style={{ marginTop: '0' }}>
+                      {maintenanceChartData.map((d) => {
+                        const pct = maxMaintenanceCost > 0 ? (d.total_cost / maxMaintenanceCost) * 100 : 0;
+                        return (
+                          <BarRow 
+                            key={d.vehicle_id}
+                            label={d.registration_number}
+                            percentage={pct}
+                            valueText={formatCurrency(d.total_cost)}
+                            color="#FF5B04"
+                          />
+                        );
+                      })}
+                    </div>
+                  ) : (
+                    <div className="empty-state">
+                      <h3>No Maintenance Costs</h3>
+                      <p>Logged maintenance logs containing costs will display here grouped by vehicle.</p>
+                    </div>
+                  )}
+                </div>
 
-                <div className="bar-chart-container">
-                  <span className="filter-label" style={{ marginBottom: '8px' }}>Visual Efficiency Comparison</span>
-                  {fuelEfficiencyData.map((d) => {
-                    const pct = maxFuelEfficiency > 0 ? (d.fuel_efficiency / maxFuelEfficiency) * 100 : 0;
-                    return (
-                      <BarRow 
-                        key={d.vehicle_id}
-                        label={`Vehicle #${d.vehicle_id}`} 
-                        percentage={pct} 
-                        valueText={`${d.fuel_efficiency.toFixed(1)} km/L`}
-                        color="#3B82F6"
-                      />
-                    );
-                  })}
+                {/* Section 2b: Visual Efficiency Comparison */}
+                <div className="report-section-card">
+                  <h2>Visual Efficiency Comparison</h2>
+                  {fuelEfficiencyData.length > 0 ? (
+                    <div className="bar-chart-container" style={{ marginTop: '0' }}>
+                      {fuelEfficiencyData.map((d) => {
+                        const pct = maxFuelEfficiency > 0 ? (d.fuel_efficiency / maxFuelEfficiency) * 100 : 0;
+                        return (
+                          <BarRow 
+                            key={d.vehicle_id}
+                            label={d.registration_number || `Vehicle #${d.vehicle_id}`} 
+                            percentage={pct} 
+                            valueText={`${d.fuel_efficiency.toFixed(1)} km/L`}
+                            color="#3B82F6"
+                          />
+                        );
+                      })}
+                    </div>
+                  ) : (
+                    <div className="empty-state">
+                      <h3>No Efficiency Data</h3>
+                      <p>Trip distances and fuel consumption logs are required to compute efficiency metrics.</p>
+                    </div>
+                  )}
                 </div>
               </div>
-            ) : (
-              <div className="empty-state">
-                <h3>No Efficiency Data</h3>
-                <p>Trip distances and fuel consumption logs are required to compute efficiency metrics.</p>
-              </div>
-            )}
-          </div>
-        )}
 
-        {/* Section 3: Maintenance Cost by Vehicle horizontal bar chart */}
-        {canViewFinancials && (
-          <div className="report-section-card">
-            <h2>Maintenance Cost by Vehicle</h2>
-            {maintenanceChartData.length > 0 ? (
-              <div className="bar-chart-container" style={{ marginTop: '0' }}>
-                {maintenanceChartData.map((d) => {
-                  const pct = maxMaintenanceCost > 0 ? (d.total_cost / maxMaintenanceCost) * 100 : 0;
-                  return (
-                    <BarRow 
-                      key={d.vehicle_id}
-                      label={`Vehicle #${d.vehicle_id}`}
-                      percentage={pct}
-                      valueText={formatCurrency(d.total_cost)}
-                      color="#FF5B04"
+              {/* Right Column */}
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
+                
+                {/* Section 2a: Fuel Efficiency Table */}
+                <div className="report-section-card">
+                  <h2>Fuel Efficiency by Vehicle</h2>
+                  {fuelEfficiencyData.length > 0 ? (
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+                      <table className="trips-table">
+                        <thead>
+                          <tr>
+                            <th>Vehicle ID</th>
+                            <th>Registration</th>
+                            <th>Distance (km)</th>
+                            <th>Fuel (L)</th>
+                            <th style={{ textAlign: 'right' }}>Efficiency (km/L)</th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          {fuelEfficiencyData.map((d) => (
+                            <tr key={d.vehicle_id}>
+                              <td>#{d.vehicle_id}</td>
+                              <td>{d.registration_number || <span style={{ color: '#9CA3AF' }}>—</span>}</td>
+                              <td>{d.total_distance.toLocaleString()}</td>
+                              <td>{d.total_fuel.toLocaleString()}</td>
+                              <td style={{ textAlign: 'right', fontWeight: '600' }}>{d.fuel_efficiency.toFixed(2)}</td>
+                            </tr>
+                          ))}
+                        </tbody>
+                      </table>
+                    </div>
+                  ) : (
+                    <div className="empty-state">
+                      <h3>No Efficiency Data</h3>
+                      <p>Trip distances and fuel consumption logs are required to compute efficiency metrics.</p>
+                    </div>
+                  )}
+                </div>
+
+                {/* Section 4: Fleet Utilization Card */}
+                <div className="report-section-card">
+                  <h2>Fleet Utilization</h2>
+                  {fleetUtilizationData?.status === 'success' ? (
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
+                      <div className="kpi-card blue" style={{ marginTop: '8px' }}>
+                        <span className="kpi-label">Current Fleet Utilization</span>
+                        <span className="kpi-value">{fleetUtilizationData.fleet_utilization}%</span>
+                      </div>
+                      <div className="info-banner" style={{ backgroundColor: '#F8FAFC', border: '1px solid #E2E8F0', color: '#475569' }}>
+                        <p style={{ margin: 0, fontSize: '0.9rem' }}>
+                          <strong>{fleetUtilizationData.vehicles_on_trip}</strong> out of <strong>{fleetUtilizationData.total_vehicles}</strong> available vehicles are currently on active trips.
+                        </p>
+                      </div>
+                    </div>
+                  ) : fleetUtilizationData?.status === 'pending_integration' ? (
+                    <PendingBanner 
+                      title="Integration Pending" 
+                      message={fleetUtilizationData.message} 
+                      formula={fleetUtilizationData._todo}
                     />
-                  );
-                })}
-              </div>
-            ) : (
-              <div className="empty-state">
-                <h3>No Maintenance Costs</h3>
-                <p>Logged maintenance logs containing costs will display here grouped by vehicle.</p>
-              </div>
-            )}
-          </div>
-        )}
+                  ) : (
+                    <div className="empty-state">
+                      <h3>No Utilization Data</h3>
+                      <p>Fleet utilization metrics are currently not available.</p>
+                    </div>
+                  )}
+                </div>
 
-        {/* Section 4: Fleet Utilization Card (waiting for Vehicle ORM) */}
-        <div className="report-section-card">
-          <h2>Fleet Utilization</h2>
-          {fleetUtilizationData?.status === 'pending_integration' ? (
-            <PendingBanner 
-              title="Integration Pending" 
-              message={fleetUtilizationData.message} 
-              formula={fleetUtilizationData._todo}
-            />
+              </div>
+            </>
           ) : (
-            <div className="empty-state">
-              <h3>No Utilization Data</h3>
-              <p>Fleet utilization metrics are currently not available.</p>
+            <div className="report-section-card">
+              <h2>Fleet Utilization</h2>
+              {fleetUtilizationData?.status === 'success' ? (
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
+                  <div className="kpi-card blue" style={{ marginTop: '8px' }}>
+                    <span className="kpi-label">Current Fleet Utilization</span>
+                    <span className="kpi-value">{fleetUtilizationData.fleet_utilization}%</span>
+                  </div>
+                  <div className="info-banner" style={{ backgroundColor: '#F8FAFC', border: '1px solid #E2E8F0', color: '#475569' }}>
+                    <p style={{ margin: 0, fontSize: '0.9rem' }}>
+                      <strong>{fleetUtilizationData.vehicles_on_trip}</strong> out of <strong>{fleetUtilizationData.total_vehicles}</strong> available vehicles are currently on active trips.
+                    </p>
+                  </div>
+                </div>
+              ) : fleetUtilizationData?.status === 'pending_integration' ? (
+                <PendingBanner 
+                  title="Integration Pending" 
+                  message={fleetUtilizationData.message} 
+                  formula={fleetUtilizationData._todo}
+                />
+              ) : (
+                <div className="empty-state">
+                  <h3>No Utilization Data</h3>
+                  <p>Fleet utilization metrics are currently not available.</p>
+                </div>
+              )}
             </div>
           )}
+
         </div>
 
-        {/* Section 5: Vehicle ROI Card (waiting for Vehicle/Trip ORM) */}
+        {/* Section 5: Vehicle ROI Card (Full width at bottom) */}
         {canViewFinancials && (
-          <div className="report-section-card" style={{ gridColumn: 'span 2' }}>
+          <div className="report-section-card">
             <h2>Vehicle ROI Analysis</h2>
-            {vehicleRoiData?.status === 'pending_integration' ? (
+            {vehicleRoiData?.status === 'success' && vehicleRoiData.roi_records.length > 0 ? (
+              <table className="trips-table">
+                <thead>
+                  <tr>
+                    <th>Registration</th>
+                    <th style={{ textAlign: 'right' }}>Revenue</th>
+                    <th style={{ textAlign: 'right' }}>Maintenance</th>
+                    <th style={{ textAlign: 'right' }}>Fuel Cost</th>
+                    <th style={{ textAlign: 'right' }}>Acq. Cost</th>
+                    <th style={{ textAlign: 'right' }}>ROI %</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {vehicleRoiData.roi_records.map((roi) => (
+                    <tr key={roi.vehicle_id}>
+                      <td style={{ fontWeight: '500' }}>{roi.registration_number}</td>
+                      <td style={{ textAlign: 'right', color: '#10B981' }}>{formatCurrency(roi.total_revenue)}</td>
+                      <td style={{ textAlign: 'right', color: '#EF4444' }}>{formatCurrency(roi.total_maintenance)}</td>
+                      <td style={{ textAlign: 'right', color: '#F59E0B' }}>{formatCurrency(roi.total_fuel)}</td>
+                      <td style={{ textAlign: 'right' }}>{formatCurrency(roi.acquisition_cost)}</td>
+                      <td style={{ textAlign: 'right', fontWeight: 'bold', color: roi.roi_percentage >= 0 ? '#10B981' : '#EF4444' }}>
+                        {roi.roi_percentage > 0 ? '+' : ''}{roi.roi_percentage.toFixed(1)}%
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            ) : vehicleRoiData?.status === 'pending_integration' ? (
               <PendingBanner 
                 title="Integration Pending" 
                 message={vehicleRoiData.message} 
@@ -508,7 +602,6 @@ const Reports = () => {
             )}
           </div>
         )}
-
       </div>
     </div>
   );
