@@ -13,6 +13,8 @@ from backend.routes.expense_routes import expense_bp
 from backend.routes.report_routes import report_bp
 from backend.routes.dashboard_routes import dashboard_bp
 from backend.routes.auth_routes import auth_bp
+from backend.routes.driver_routes import driver_bp
+from backend.routes.trip_routes import trip_bp
 
 def create_app(config_class=Config):
     app = Flask(__name__)
@@ -32,6 +34,8 @@ def create_app(config_class=Config):
 
     from backend.routes.vehicle_routes import vehicle_bp
     app.register_blueprint(vehicle_bp)
+    app.register_blueprint(driver_bp)
+    app.register_blueprint(trip_bp)
     app.register_blueprint(dashboard_bp)
     app.register_blueprint(auth_bp, url_prefix='/api/auth')
 
