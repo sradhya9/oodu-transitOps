@@ -1,10 +1,11 @@
-import { useState, useEffect } from "react";
+import React, { useState, useEffect, useContext } from "react";
+import { AuthContext } from "../context/AuthContext";
+import { Eye, Play, CheckCircle, XCircle, Plus, Trash2 } from "lucide-react";
 import { getTrips, createTrip, dispatchTrip, completeTrip, cancelTrip } from "../services/tripService";
 import { getAvailableDrivers, getDrivers } from "../services/driverService";
 import { vehicleService } from "../services/vehicleService";
 import Modal from "../components/Modal";
 import Toast from "../components/Toast";
-import "../styles/dashboard.css";
 import "../styles/vehicles.css";
 
 const Trips = () => {
@@ -12,6 +13,9 @@ const Trips = () => {
   const [summary, setSummary] = useState({ total: 0, draft: 0, active: 0, completed: 0, cancelled: 0 });
   const [meta, setMeta] = useState({ current_page: 1, total_pages: 1, limit: 10 });
   const [loading, setLoading] = useState(false);
+  const { user } = useContext(AuthContext);
+  const role = user?.role || '';
+  const canEdit = role === 'Fleet Manager' || role === 'Dispatcher' || role === 'System Admin';
 
   // Filters
   const [search, setSearch] = useState("");
@@ -232,59 +236,62 @@ const Trips = () => {
 
   const getStatusBadgeClass = (status) => {
     switch (status) {
-      case "Draft": return "bg-gray-400"; // Using inline colors or standard classes from vehicles.css
-      case "Dispatched": return "blue";
-      case "Completed": return "green";
-      case "Cancelled": return "red";
+      case "Draft": return "draft";
+      case "Dispatched": return "dispatched";
+      case "Completed": return "completed";
+      case "Cancelled": return "cancelled";
       default: return "";
     }
   };
 
   return (
-    <div className="dashboard-container">
-      <div className="page-header" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-        <h2>Trip Management</h2>
-        <button className="btn-primary" onClick={() => openModal("add")}>+ Create Trip</button>
+    <div className="vehicles-container">
+      <div className="vehicles-header">
+        <div className="vehicles-header-text">
+          <h1>Trip Management</h1>
+          <p>Manage fleet operations and trips</p>
+        </div>
+        {canEdit && (
+          <button className="add-btn" onClick={() => openModal("add")}>
+            <Plus size={18} strokeWidth={2.5} /> Create Trip
+          </button>
+        )}
       </div>
 
       {/* KPI Cards */}
       <div className="kpi-grid">
-        <div className="kpi-card">
+        <div className="kpi-card total">
           <span className="kpi-label">Total Trips</span>
           <span className="kpi-value">{summary.total}</span>
         </div>
-        <div className="kpi-card" style={{ borderLeftColor: '#9CA3AF' }}>
+        <div className="kpi-card draft">
           <span className="kpi-label">Draft</span>
           <span className="kpi-value">{summary.draft}</span>
         </div>
-        <div className="kpi-card blue">
+        <div className="kpi-card dispatched">
           <span className="kpi-label">Active (Dispatched)</span>
           <span className="kpi-value">{summary.active}</span>
         </div>
-        <div className="kpi-card green">
+        <div className="kpi-card completed">
           <span className="kpi-label">Completed</span>
           <span className="kpi-value">{summary.completed}</span>
         </div>
-        <div className="kpi-card red">
+        <div className="kpi-card cancelled">
           <span className="kpi-label">Cancelled</span>
           <span className="kpi-value">{summary.cancelled}</span>
         </div>
       </div>
 
       {/* Filters & Search */}
-      <div className="filters-row">
-        <div className="filter-group">
-          <label className="filter-label">Search</label>
-          <input
-            type="text"
-            className="filter-select"
-            placeholder="Trip ID, Location..."
-            value={search}
-            onChange={(e) => setSearch(e.target.value)}
-          />
-        </div>
-        <div className="filter-group">
-          <label className="filter-label">Status</label>
+      <div className="controls-row">
+        <input
+          type="text"
+          className="search-input"
+          placeholder="Search Trip ID, Location..."
+          value={search}
+          onChange={(e) => setSearch(e.target.value)}
+        />
+        <div className="filters-group">
           <select className="filter-select" value={statusFilter} onChange={(e) => setStatusFilter(e.target.value)}>
             <option value="">All Statuses</option>
             <option value="Draft">Draft</option>
@@ -292,18 +299,12 @@ const Trips = () => {
             <option value="Completed">Completed</option>
             <option value="Cancelled">Cancelled</option>
           </select>
-        </div>
-        <div className="filter-group">
-          <label className="filter-label">Vehicle</label>
           <select className="filter-select" value={vehicleFilter} onChange={(e) => setVehicleFilter(e.target.value)}>
             <option value="">All Vehicles</option>
             {allVehicles.map(v => (
               <option key={v.id} value={v.id}>{v.registration_number}</option>
             ))}
           </select>
-        </div>
-        <div className="filter-group">
-          <label className="filter-label">Driver</label>
           <select className="filter-select" value={driverFilter} onChange={(e) => setDriverFilter(e.target.value)}>
             <option value="">All Drivers</option>
             {allDrivers.map(d => (
@@ -314,112 +315,113 @@ const Trips = () => {
       </div>
 
       {/* Data Table */}
-      <div className="table-container" style={{ overflowX: 'auto', backgroundColor: '#fff', border: '1px solid var(--border-color)', borderRadius: '6px' }}>
-        <table className="data-table trips-table">
-          <thead>
-            <tr>
-              <th>Trip ID</th>
-              <th>Source</th>
-              <th>Destination</th>
-              <th>Vehicle</th>
-              <th>Driver</th>
-              <th>Status</th>
-              <th>Start Date</th>
-              <th>Actions</th>
-            </tr>
-          </thead>
-          <tbody>
-            {loading ? (
-              <tr><td colSpan="8" style={{ textAlign: "center" }}>Loading...</td></tr>
-            ) : trips.length === 0 ? (
-              <tr><td colSpan="8" style={{ textAlign: "center" }}>No trips found.</td></tr>
-            ) : (
-              trips.map((t) => (
-                <tr key={t.id}>
-                  <td>{t.trip_number}</td>
-                  <td>{t.source_location}</td>
-                  <td>{t.destination_location}</td>
-                  <td>{t.vehicle_registration}</td>
-                  <td>{t.driver_name}</td>
-                  <td>
-                    <span className={`status-badge status-bar-fill ${getStatusBadgeClass(t.status)}`} style={{ width: 'auto', display: 'inline-block', backgroundColor: t.status === 'Draft' ? '#9CA3AF' : undefined }}>
-                      {t.status}
-                    </span>
-                  </td>
-                  <td>{t.dispatch_time ? t.dispatch_time.substring(0, 10) : '-'}</td>
-                  <td>
-                    <div className="action-buttons" style={{ display: 'flex', gap: '8px' }}>
-                      <button className="btn-sm" onClick={() => openModal("view", t)}>View</button>
-
-                      {t.status === 'Draft' && (
-                        <>
-                          <button className="btn-sm" style={{ backgroundColor: '#3B82F6', color: '#fff', border: 'none' }} onClick={() => openModal("dispatch", t)}>Dispatch</button>
-                          <button className="btn-sm btn-danger" style={{ backgroundColor: '#EF4444', color: '#fff', border: 'none' }} onClick={() => openModal("cancel", t)}>Cancel</button>
-                        </>
-                      )}
-
-                      {t.status === 'Dispatched' && (
-                        <>
-                          <button className="btn-sm" style={{ backgroundColor: '#10B981', color: '#fff', border: 'none' }} onClick={() => openModal("complete", t)}>Complete</button>
-                          <button className="btn-sm btn-danger" style={{ backgroundColor: '#EF4444', color: '#fff', border: 'none' }} onClick={() => openModal("cancel", t)}>Cancel</button>
-                        </>
-                      )}
-                    </div>
-                  </td>
-                </tr>
-              ))
+      <div className="data-table-container">
+        {loading ? (
+          <div className="loading-state">Loading trips...</div>
+        ) : trips.length === 0 ? (
+          <div className="empty-state">
+            <p>No trips found.</p>
+            {canEdit && (
+              <button className="add-btn" style={{marginTop: '16px'}} onClick={() => openModal('add')}>
+                <Plus size={18} strokeWidth={2.5} /> Create Trip
+              </button>
             )}
-          </tbody>
-        </table>
-      </div>
+          </div>
+        ) : (
+          <>
+            <table className="data-table">
+              <thead>
+                <tr>
+                  <th>Trip ID</th>
+                  <th>Source</th>
+                  <th>Destination</th>
+                  <th>Vehicle</th>
+                  <th>Driver</th>
+                  <th>Status</th>
+                  <th>Start Date</th>
+                  <th>Actions</th>
+                </tr>
+              </thead>
+              <tbody>
+                {trips.map((t) => (
+                  <tr key={t.id}>
+                    <td>{t.trip_number}</td>
+                    <td>{t.source_location}</td>
+                    <td>{t.destination_location}</td>
+                    <td>{t.vehicle_registration}</td>
+                    <td>{t.driver_name}</td>
+                    <td>
+                      <span className={`status-badge ${getStatusBadgeClass(t.status)}`}>
+                        {t.status}
+                      </span>
+                    </td>
+                    <td>{t.dispatch_time ? t.dispatch_time.substring(0, 10) : '-'}</td>
+                    <td className="actions-cell">
+                      <button className="action-btn btn-icon-only" title="View Details" onClick={() => openModal("view", t)}><Eye size={16} /></button>
 
-      {/* Pagination Controls */}
-      <div className="pagination" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-        <div className="limit-selector">
-          <label>Rows per page: </label>
-          <select value={meta.limit} onChange={(e) => setMeta({ ...meta, limit: parseInt(e.target.value), current_page: 1 })} style={{ padding: '4px' }}>
-            <option value="10">10</option>
-            <option value="25">25</option>
-            <option value="50">50</option>
-            <option value="100">100</option>
-          </select>
-        </div>
-        <div className="page-controls" style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
-          <button
-            disabled={meta.current_page <= 1}
-            onClick={() => setMeta({ ...meta, current_page: meta.current_page - 1 })}
-            style={{ padding: '4px 12px' }}
-          >Prev</button>
-          <span>Page {meta.current_page} of {meta.total_pages || 1}</span>
-          <button
-            disabled={meta.current_page >= meta.total_pages}
-            onClick={() => setMeta({ ...meta, current_page: meta.current_page + 1 })}
-            style={{ padding: '4px 12px' }}
-          >Next</button>
-        </div>
+                      {canEdit && t.status === 'Draft' && (
+                        <>
+                          <button className="action-btn btn-icon-only" title="Dispatch Trip" onClick={() => openModal("dispatch", t)} style={{ color: '#3B82F6' }}><Play size={16} /></button>
+                          <button className="action-btn delete btn-icon-only" title="Cancel Trip" onClick={() => openModal("cancel", t)}><XCircle size={16} /></button>
+                        </>
+                      )}
+
+                      {canEdit && t.status === 'Dispatched' && (
+                        <>
+                          <button className="action-btn btn-icon-only" title="Complete Trip" onClick={() => openModal("complete", t)} style={{ color: '#10B981' }}><CheckCircle size={16} /></button>
+                          <button className="action-btn delete btn-icon-only" title="Cancel Trip" onClick={() => openModal("cancel", t)}><XCircle size={16} /></button>
+                        </>
+                      )}
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+            <div className="pagination">
+              <div className="page-info">
+                Showing {(meta.current_page - 1) * meta.limit + 1} to {Math.min(meta.current_page * meta.limit, summary.total)} of {summary.total} entries
+              </div>
+              <div className="pagination-controls">
+                <select className="filter-select" value={meta.limit} onChange={(e) => setMeta({ ...meta, limit: parseInt(e.target.value), current_page: 1 })}>
+                  <option value="10">10 per page</option>
+                  <option value="25">25 per page</option>
+                  <option value="50">50 per page</option>
+                  <option value="100">100 per page</option>
+                </select>
+                <button
+                  className="page-btn"
+                  disabled={meta.current_page <= 1}
+                  onClick={() => setMeta({ ...meta, current_page: meta.current_page - 1 })}
+                >Prev</button>
+                <button
+                  className="page-btn"
+                  disabled={meta.current_page >= meta.total_pages}
+                  onClick={() => setMeta({ ...meta, current_page: meta.current_page + 1 })}
+                >Next</button>
+              </div>
+            </div>
+          </>
+        )}
       </div>
 
       {/* Creation Modal */}
       {modalMode === "add" && (
         <Modal isOpen={isModalOpen} onClose={closeModal} title="Create Trip">
-          <form onSubmit={handleCreateTrip} style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
-
-            <div style={{ display: 'flex', gap: '16px' }}>
-              <div className="form-group" style={{ display: 'flex', flexDirection: 'column', gap: '4px', flex: 1 }}>
-                <label>Source Location</label>
-                <input type="text" name="source_location" className="filter-select" required value={formData.source_location} onChange={handleInputChange} />
+          <form onSubmit={handleCreateTrip}>
+            <div className="view-details">
+              <div className="form-group">
+                <label>Source Location *</label>
+                <input type="text" name="source_location" className="form-control" required value={formData.source_location} onChange={handleInputChange} />
               </div>
 
-              <div className="form-group" style={{ display: 'flex', flexDirection: 'column', gap: '4px', flex: 1 }}>
-                <label>Destination Location</label>
-                <input type="text" name="destination_location" className="filter-select" required value={formData.destination_location} onChange={handleInputChange} />
+              <div className="form-group">
+                <label>Destination Location *</label>
+                <input type="text" name="destination_location" className="form-control" required value={formData.destination_location} onChange={handleInputChange} />
               </div>
-            </div>
-
-            <div style={{ display: 'flex', gap: '16px' }}>
-              <div className="form-group" style={{ display: 'flex', flexDirection: 'column', gap: '4px', flex: 1 }}>
-                <label>Select Vehicle</label>
-                <select name="vehicle_id" className="filter-select" required value={formData.vehicle_id} onChange={handleInputChange}>
+              
+              <div className="form-group">
+                <label>Select Vehicle *</label>
+                <select name="vehicle_id" className="form-control" required value={formData.vehicle_id} onChange={handleInputChange}>
                   <option value="">-- Choose Available Vehicle --</option>
                   {availableVehicles.map(v => (
                     <option key={v.id} value={v.id}>{v.registration_number} (Max Load: {v.max_load_capacity})</option>
@@ -427,32 +429,30 @@ const Trips = () => {
                 </select>
               </div>
 
-              <div className="form-group" style={{ display: 'flex', flexDirection: 'column', gap: '4px', flex: 1 }}>
-                <label>Select Driver</label>
-                <select name="driver_id" className="filter-select" required value={formData.driver_id} onChange={handleInputChange}>
+              <div className="form-group">
+                <label>Select Driver *</label>
+                <select name="driver_id" className="form-control" required value={formData.driver_id} onChange={handleInputChange}>
                   <option value="">-- Choose Available Driver --</option>
                   {availableDrivers.map(d => (
                     <option key={d.id} value={d.id}>{d.full_name} ({d.license_number})</option>
                   ))}
                 </select>
               </div>
-            </div>
 
-            <div style={{ display: 'flex', gap: '16px' }}>
-              <div className="form-group" style={{ display: 'flex', flexDirection: 'column', gap: '4px', flex: 1 }}>
-                <label>Cargo Weight</label>
-                <input type="number" name="cargo_weight" className="filter-select" min="0" step="0.1" required value={formData.cargo_weight} onChange={handleInputChange} />
+              <div className="form-group">
+                <label>Cargo Weight *</label>
+                <input type="number" name="cargo_weight" className="form-control" min="0" step="0.1" required value={formData.cargo_weight} onChange={handleInputChange} />
               </div>
 
-              <div className="form-group" style={{ display: 'flex', flexDirection: 'column', gap: '4px', flex: 1 }}>
+              <div className="form-group">
                 <label>Planned Distance (optional)</label>
-                <input type="number" name="planned_distance" className="filter-select" min="0" step="0.1" value={formData.planned_distance} onChange={handleInputChange} />
+                <input type="number" name="planned_distance" className="form-control" min="0" step="0.1" value={formData.planned_distance} onChange={handleInputChange} />
               </div>
             </div>
 
-            <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '12px', marginTop: '16px' }}>
-              <button type="button" className="btn-secondary" style={{ padding: '8px 16px', cursor: 'pointer' }} onClick={closeModal}>Cancel</button>
-              <button type="submit" className="btn-primary" style={{ padding: '8px 16px', background: '#3B82F6', color: '#fff', border: 'none', borderRadius: '4px', cursor: 'pointer' }}>Create Draft Trip</button>
+            <div className="form-actions">
+              <button type="button" className="btn-cancel" onClick={closeModal}>Cancel</button>
+              <button type="submit" className="btn-submit" style={{ background: '#3B82F6', color: '#fff', border: 'none' }}>Create Draft Trip</button>
             </div>
           </form>
         </Modal>
@@ -461,24 +461,24 @@ const Trips = () => {
       {/* Complete Trip Modal */}
       {modalMode === "complete" && (
         <Modal isOpen={isModalOpen} onClose={closeModal} title={`Complete Trip: ${selectedTrip?.trip_number}`}>
-          <form onSubmit={handleCompleteSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
-            <p>Please enter the final trip details before completing.</p>
-            <div className="form-group" style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
-              <label>Final Odometer Reading</label>
-              <input type="number" name="end_odometer" className="filter-select" required value={completionData.end_odometer} onChange={handleCompletionChange} />
-              {formErrors.end_odometer && <span style={{ color: '#EF4444', fontSize: '13px', marginTop: '4px' }}>{formErrors.end_odometer}</span>}
+          <form onSubmit={handleCompleteSubmit}>
+            <p style={{marginBottom: '16px'}}>Please enter the final trip details before completing.</p>
+            <div className="form-group">
+              <label>Final Odometer Reading *</label>
+              <input type="number" name="end_odometer" className="form-control" required value={completionData.end_odometer} onChange={handleCompletionChange} />
+              {formErrors.end_odometer && <span className="error-text">{formErrors.end_odometer}</span>}
             </div>
-            <div className="form-group" style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
+            <div className="form-group">
               <label>Fuel Consumed (Liters)</label>
-              <input type="number" name="fuel_consumed" className="filter-select" value={completionData.fuel_consumed} onChange={handleCompletionChange} />
+              <input type="number" name="fuel_consumed" className="form-control" value={completionData.fuel_consumed} onChange={handleCompletionChange} />
             </div>
-            <div className="form-group" style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
+            <div className="form-group">
               <label>Revenue Generated ($)</label>
-              <input type="number" name="revenue" className="filter-select" value={completionData.revenue} onChange={handleCompletionChange} />
+              <input type="number" name="revenue" className="form-control" value={completionData.revenue} onChange={handleCompletionChange} />
             </div>
-            <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '12px', marginTop: '16px' }}>
-              <button type="button" className="btn-secondary" style={{ padding: '8px 16px', cursor: 'pointer' }} onClick={closeModal}>Cancel</button>
-              <button type="submit" className="btn-primary" style={{ padding: '8px 16px', background: '#10B981', color: '#fff', border: 'none', borderRadius: '4px', cursor: 'pointer' }}>Mark as Completed</button>
+            <div className="form-actions">
+              <button type="button" className="btn-cancel" onClick={closeModal}>Cancel</button>
+              <button type="submit" className="btn-submit" style={{ background: '#10B981', color: '#fff', border: 'none' }}>Mark as Completed</button>
             </div>
           </form>
         </Modal>
@@ -487,17 +487,17 @@ const Trips = () => {
       {/* Dispatch/Cancel Confirmation Modals */}
       {(modalMode === "dispatch" || modalMode === "cancel") && (
         <Modal isOpen={isModalOpen} onClose={closeModal} title={modalMode === "dispatch" ? "Dispatch Trip" : "Cancel Trip"}>
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+          <div>
             <p>
               {modalMode === "dispatch"
                 ? `Are you sure you want to dispatch trip ${selectedTrip?.trip_number}? This will mark the assigned Vehicle and Driver as 'On Trip'.`
                 : `Are you sure you want to cancel trip ${selectedTrip?.trip_number}? This will free up the assigned Vehicle and Driver.`}
             </p>
-            <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '12px' }}>
-              <button className="btn-secondary" style={{ padding: '8px 16px', cursor: 'pointer' }} onClick={closeModal}>Go Back</button>
+            <div className="form-actions">
+              <button className="btn-cancel" onClick={closeModal}>Go Back</button>
               <button
-                className="btn-primary"
-                style={{ padding: '8px 16px', background: modalMode === "dispatch" ? '#3B82F6' : '#EF4444', color: '#fff', border: 'none', borderRadius: '4px', cursor: 'pointer' }}
+                className="btn-submit"
+                style={{ background: modalMode === "dispatch" ? '#3B82F6' : '#EF4444', color: '#fff', border: 'none' }}
                 onClick={() => handleAction(modalMode === "dispatch" ? dispatchTrip : cancelTrip, selectedTrip.id)}
               >
                 Confirm {modalMode === "dispatch" ? "Dispatch" : "Cancel"}
@@ -510,15 +510,18 @@ const Trips = () => {
       {/* View Modal */}
       {modalMode === "view" && (
         <Modal isOpen={isModalOpen} onClose={closeModal} title={`Trip Details: ${selectedTrip?.trip_number}`}>
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
-            <p><strong>Status:</strong> {selectedTrip?.status}</p>
-            <p><strong>Route:</strong> {selectedTrip?.source_location} ➔ {selectedTrip?.destination_location}</p>
-            <p><strong>Vehicle:</strong> {selectedTrip?.vehicle_registration}</p>
-            <p><strong>Driver:</strong> {selectedTrip?.driver_name}</p>
-            <p><strong>Cargo Weight:</strong> {selectedTrip?.cargo_weight} kg</p>
-            <p><strong>Created:</strong> {selectedTrip?.created_at?.substring(0, 10)}</p>
-            <div style={{ display: 'flex', justifyContent: 'flex-end', marginTop: '16px' }}>
-              <button className="btn-secondary" style={{ padding: '8px 16px', cursor: 'pointer' }} onClick={closeModal}>Close</button>
+          <div>
+            <div className="view-details">
+              <div className="detail-item"><div className="detail-label">Status</div><div className="detail-value"><span className={`status-badge ${getStatusBadgeClass(selectedTrip?.status)}`}>{selectedTrip?.status}</span></div></div>
+              <div className="detail-item"><div className="detail-label">Vehicle</div><div className="detail-value">{selectedTrip?.vehicle_registration}</div></div>
+              <div className="detail-item"><div className="detail-label">Driver</div><div className="detail-value">{selectedTrip?.driver_name}</div></div>
+              <div className="detail-item"><div className="detail-label">Cargo Weight</div><div className="detail-value">{selectedTrip?.cargo_weight} kg</div></div>
+              <div className="detail-item"><div className="detail-label">Source</div><div className="detail-value">{selectedTrip?.source_location}</div></div>
+              <div className="detail-item"><div className="detail-label">Destination</div><div className="detail-value">{selectedTrip?.destination_location}</div></div>
+              <div className="detail-item"><div className="detail-label">Created</div><div className="detail-value">{selectedTrip?.created_at?.substring(0, 10)}</div></div>
+            </div>
+            <div className="form-actions">
+              <button className="btn-cancel" onClick={closeModal}>Close</button>
             </div>
           </div>
         </Modal>

@@ -49,7 +49,12 @@
 .kpi-card.on-trip { border-bottom: 4px solid #3B82F6; }
 .kpi-card.in-shop { border-bottom: 4px solid #F59E0B; }
 .kpi-card.retired { border-bottom: 4px solid #EF4444; }
-
+.kpi-card.off-duty { border-bottom: 4px solid #64748B; }
+.kpi-card.suspended { border-bottom: 4px solid #EF4444; }
+.kpi-card.draft { border-bottom: 4px solid #9CA3AF; }
+.kpi-card.dispatched { border-bottom: 4px solid #3B82F6; }
+.kpi-card.completed { border-bottom: 4px solid #10B981; }
+.kpi-card.cancelled { border-bottom: 4px solid #EF4444; }
 .controls-row {
   display: flex;
   justify-content: space-between;
@@ -159,6 +164,12 @@
 .status-badge.on-trip { background-color: rgba(59, 130, 246, 0.15); color: #3B82F6; }
 .status-badge.in-shop { background-color: rgba(245, 158, 11, 0.15); color: #F59E0B; }
 .status-badge.retired { background-color: rgba(239, 68, 68, 0.15); color: #EF4444; }
+.status-badge.off-duty { background-color: rgba(100, 116, 139, 0.15); color: #64748B; }
+.status-badge.suspended { background-color: rgba(239, 68, 68, 0.15); color: #EF4444; }
+.status-badge.draft { background-color: rgba(156, 163, 175, 0.15); color: #6B7280; }
+.status-badge.dispatched { background-color: rgba(59, 130, 246, 0.15); color: #3B82F6; }
+.status-badge.completed { background-color: rgba(16, 185, 129, 0.15); color: #10B981; }
+.status-badge.cancelled { background-color: rgba(239, 68, 68, 0.15); color: #EF4444; }
 
 .actions-cell {
   display: flex;
