@@ -1,7 +1,8 @@
-from flask import Blueprint, request, jsonify
+from flask import Blueprint, request, jsonify, g
 from datetime import datetime
 from backend.database import db
 from backend.database.models import Expense
+from backend.middleware.auth import authenticate
 
 expense_bp = Blueprint('expenses', __name__, url_prefix='/expenses')
 
@@ -30,9 +31,15 @@ def parse_date(date_str):
 
 # GET /expenses - Return all expense records
 @expense_bp.route('', methods=['GET'])
+@authenticate()
 def get_all_expenses():
     try:
-        logs = Expense.query.order_by(Expense.created_at.desc(), Expense.id.desc()).all()
+        user = g.current_user
+        query = Expense.query
+        if user.role.role_name == 'Driver':
+            query = query.filter(Expense.created_by == user.id)
+            
+        logs = query.order_by(Expense.created_at.desc(), Expense.id.desc()).all()
         return jsonify([serialize_expense(log) for log in logs]), 200
     except Exception as e:
         return jsonify({"error": "Failed to fetch expenses", "details": str(e)}), 500
@@ -50,6 +57,7 @@ def get_expense(log_id):
 
 # POST /expenses - Create a new expense record
 @expense_bp.route('', methods=['POST'])
+@authenticate()
 def create_expense():
     data = request.get_json() or {}
     errors = {}
@@ -138,6 +146,7 @@ def create_expense():
 
 # PUT /expenses/<id> - Update an existing expense record
 @expense_bp.route('/<int:log_id>', methods=['PUT'])
+@authenticate()
 def update_expense(log_id):
     try:
         log = Expense.query.get(log_id)
@@ -226,6 +235,7 @@ def update_expense(log_id):
 
 # DELETE /expenses/<id> - Delete an expense record
 @expense_bp.route('/<int:log_id>', methods=['DELETE'])
+@authenticate()
 def delete_expense(log_id):
     try:
         log = Expense.query.get(log_id)

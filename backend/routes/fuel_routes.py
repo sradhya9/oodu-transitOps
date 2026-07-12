@@ -1,9 +1,10 @@
-from flask import Blueprint, request, jsonify
+from flask import Blueprint, request, jsonify, g
 from datetime import datetime
 from backend.database import db
 from backend.database.models import FuelLog
+from backend.middleware.auth import authenticate
 
-fuel_bp = Blueprint('fuel', __name__, url_prefix='/fuel')
+fuel_bp = Blueprint('fuel_logs', __name__, url_prefix='/fuel-logs')
 
 def serialize_fuel(log):
     return {
@@ -26,11 +27,17 @@ def parse_date(date_str):
     except (ValueError, TypeError):
         raise ValueError("Invalid date format. Must be YYYY-MM-DD")
 
-# GET /fuel - Return all fuel logs
+# GET /fuel-logs - Return all fuel records
 @fuel_bp.route('', methods=['GET'])
-def get_all_fuel():
+@authenticate()
+def get_all_fuel_logs():
     try:
-        logs = FuelLog.query.order_by(FuelLog.created_at.desc(), FuelLog.id.desc()).all()
+        user = g.current_user
+        query = FuelLog.query
+        if user.role.role_name == 'Driver':
+            query = query.filter(FuelLog.created_by == user.id)
+            
+        logs = query.order_by(FuelLog.created_at.desc(), FuelLog.id.desc()).all()
         return jsonify([serialize_fuel(log) for log in logs]), 200
     except Exception as e:
         return jsonify({"error": "Failed to fetch fuel logs", "details": str(e)}), 500
@@ -46,9 +53,10 @@ def get_fuel(log_id):
     except Exception as e:
         return jsonify({"error": "Failed to fetch the fuel log", "details": str(e)}), 500
 
-# POST /fuel - Create a new fuel log
+# POST /fuel-logs - Create a new fuel record
 @fuel_bp.route('', methods=['POST'])
-def create_fuel():
+@authenticate()
+def create_fuel_log():
     data = request.get_json() or {}
     errors = {}
     
@@ -154,9 +162,10 @@ def create_fuel():
         db.session.rollback()
         return jsonify({"error": "Failed to create fuel log", "details": str(e)}), 500
 
-# PUT /fuel/<id> - Update an existing fuel log
+# PUT /fuel-logs/<id> - Update an existing fuel record
 @fuel_bp.route('/<int:log_id>', methods=['PUT'])
-def update_fuel(log_id):
+@authenticate()
+def update_fuel_log(log_id):
     try:
         log = FuelLog.query.get(log_id)
         if not log:
@@ -253,9 +262,10 @@ def update_fuel(log_id):
         db.session.rollback()
         return jsonify({"error": "Failed to update fuel log", "details": str(e)}), 500
 
-# DELETE /fuel/<id> - Delete a fuel log
+# DELETE /fuel-logs/<id> - Delete a fuel record
 @fuel_bp.route('/<int:log_id>', methods=['DELETE'])
-def delete_fuel(log_id):
+@authenticate()
+def delete_fuel_log(log_id):
     try:
         log = FuelLog.query.get(log_id)
         if not log:

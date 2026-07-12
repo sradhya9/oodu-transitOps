@@ -133,6 +133,18 @@ const Dashboard = () => {
             <span className="kpi-value">{stats.fleetUtilization}%</span>
           </div>
         )}
+        {role === 'Driver' && (
+          <div className="kpi-card blue">
+            <span className="kpi-label">My Active Trips</span>
+            <span className="kpi-value">{stats.activeTrips}</span>
+          </div>
+        )}
+        {role === 'Driver' && (
+          <div className="kpi-card blue">
+            <span className="kpi-label">My Pending Trips</span>
+            <span className="kpi-value">{stats.pendingTrips}</span>
+          </div>
+        )}
       </div>
 
       <div className="dashboard-content-grid">
@@ -166,27 +178,29 @@ const Dashboard = () => {
           </table>
         </div>
 
-        <div className="vehicle-status-section">
-          <h2 className="section-title">Vehicle Status</h2>
-          <div className="status-list">
-            <div className="status-item">
-              <span className="status-item-label">Available</span>
-              <div className="status-bar-bg"><div className="status-bar-fill green"></div></div>
-            </div>
-            <div className="status-item">
-              <span className="status-item-label">On Trip</span>
-              <div className="status-bar-bg"><div className="status-bar-fill blue"></div></div>
-            </div>
-            <div className="status-item">
-              <span className="status-item-label">In Shop</span>
-              <div className="status-bar-bg"><div className="status-bar-fill orange"></div></div>
-            </div>
-            <div className="status-item">
-              <span className="status-item-label">Retired</span>
-              <div className="status-bar-bg"><div className="status-bar-fill red"></div></div>
+        {role !== 'Driver' && (
+          <div className="vehicle-status-section">
+            <h2 className="section-title">Vehicle Status</h2>
+            <div className="status-list">
+              <div className="status-item">
+                <span className="status-item-label">Available</span>
+                <div className="status-bar-bg"><div className="status-bar-fill green"></div></div>
+              </div>
+              <div className="status-item">
+                <span className="status-item-label">On Trip</span>
+                <div className="status-bar-bg"><div className="status-bar-fill blue"></div></div>
+              </div>
+              <div className="status-item">
+                <span className="status-item-label">In Shop</span>
+                <div className="status-bar-bg"><div className="status-bar-fill orange"></div></div>
+              </div>
+              <div className="status-item">
+                <span className="status-item-label">Retired</span>
+                <div className="status-bar-bg"><div className="status-bar-fill red"></div></div>
+              </div>
             </div>
           </div>
-        </div>
+        )}
       </div>
 
       <div className="health-status-box">
