@@ -7,6 +7,7 @@ from sqlalchemy.exc import OperationalError
 from backend.config.settings import Config
 from backend.database import db, migrate
 from backend.routes.main_routes import main_bp
+from backend.routes.dashboard_routes import dashboard_bp
 
 def create_app(config_class=Config):
     app = Flask(__name__)
@@ -19,6 +20,7 @@ def create_app(config_class=Config):
 
     # Register blueprints
     app.register_blueprint(main_bp)
+    app.register_blueprint(dashboard_bp)
 
     # Test database connection on startup
     with app.app_context():

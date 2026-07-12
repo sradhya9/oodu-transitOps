@@ -1,9 +1,10 @@
 import { useState } from 'react';
-import { Outlet, NavLink, Link } from 'react-router-dom';
+import { Outlet, NavLink, Link, useLocation } from 'react-router-dom';
 import '../styles/layout.css';
 
 const MainLayout = () => {
   const [sidebarOpen, setSidebarOpen] = useState(false);
+  const location = useLocation();
 
   const toggleSidebar = () => {
     setSidebarOpen(!sidebarOpen);
@@ -11,13 +12,13 @@ const MainLayout = () => {
 
   const navLinks = [
     { path: '/dashboard', label: 'Dashboard' },
-    { path: '/vehicles', label: 'Vehicles' },
+    { path: '/vehicles', label: 'Fleet' },
     { path: '/drivers', label: 'Drivers' },
     { path: '/trips', label: 'Trips' },
     { path: '/maintenance', label: 'Maintenance' },
-    { path: '/fuel-logs', label: 'Fuel Logs' },
-    { path: '/expenses', label: 'Expenses' },
-    { path: '/reports', label: 'Reports' },
+    { path: '/fuel-logs', label: 'Fuel & Expenses' },
+    { path: '/reports', label: 'Analytics' },
+    { path: '/settings', label: 'Settings' }
   ];
 
   return (
@@ -49,15 +50,26 @@ const MainLayout = () => {
 
       {/* Main Content Area */}
       <main className="main-content">
-        {/* Top Navbar */}
+        {/* Topbar */}
         <header className="topbar">
-          <button className="menu-toggle" onClick={toggleSidebar}>
-            ☰
-          </button>
+          <div className="search-container">
+            <button className="menu-toggle" onClick={toggleSidebar}>
+              ☰
+            </button>
+            <input 
+              type="text" 
+              className="search-input" 
+              placeholder="Search..." 
+            />
+          </div>
+          
           <div className="topbar-right">
             <div className="user-profile">
-              <span className="user-name">Admin</span>
-              <div className="avatar">A</div>
+              <div className="user-info">
+                <span className="user-name">Raven K.</span>
+                <span className="user-badge">Dispatcher <span style={{marginLeft: '4px', fontSize: '10px'}}>▼</span></span>
+              </div>
+              <div className="avatar">RK</div>
             </div>
           </div>
         </header>

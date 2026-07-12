@@ -9,6 +9,7 @@ import Maintenance from './pages/Maintenance';
 import FuelLogs from './pages/FuelLogs';
 import Expenses from './pages/Expenses';
 import Reports from './pages/Reports';
+import Settings from './pages/Settings';
 import NotFound from './pages/NotFound';
 
 function App() {
@@ -23,8 +24,8 @@ function App() {
         <Route path="trips" element={<Trips />} />
         <Route path="maintenance" element={<Maintenance />} />
         <Route path="fuel-logs" element={<FuelLogs />} />
-        <Route path="expenses" element={<Expenses />} />
         <Route path="reports" element={<Reports />} />
+        <Route path="settings" element={<Settings />} />
       </Route>
       <Route path="*" element={<NotFound />} />
     </Routes>
