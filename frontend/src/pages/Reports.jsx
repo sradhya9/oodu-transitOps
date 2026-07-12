@@ -19,6 +19,10 @@ const formatCurrency = (val) => val !== null && val !== undefined
   ? `₹${val.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`
   : '₹0.00';
 
+const formatCurrencyCompact = (val) => val !== null && val !== undefined
+  ? `₹${val.toLocaleString(undefined, { notation: 'compact', maximumFractionDigits: 1 })}`
+  : '₹0';
+
 const KpiCard = ({ title, value, color }) => (
   <div className={`kpi-card ${color}`}>
     <span className="kpi-label">{title}</span>
@@ -98,15 +102,18 @@ const Reports = () => {
 
       // Process raw maintenance logs into totals grouped by vehicle_id
       const maintByVehicle = {};
+      const regByVehicle = {};
       maintenanceLogs.forEach((log) => {
         if (log.vehicle_id && log.maintenance_cost) {
           const cost = parseFloat(log.maintenance_cost);
           maintByVehicle[log.vehicle_id] = (maintByVehicle[log.vehicle_id] || 0) + cost;
+          regByVehicle[log.vehicle_id] = log.vehicle_registration || `Vehicle #${log.vehicle_id}`;
         }
       });
 
       const maintChart = Object.entries(maintByVehicle).map(([vId, cost]) => ({
         vehicle_id: vId,
+        registration_number: regByVehicle[vId],
         total_cost: cost
       }));
       maintChart.sort((a, b) => b.total_cost - a.total_cost);
@@ -148,10 +155,10 @@ const Reports = () => {
     // Custom donut pie-chart segment mapping
     const pieChartStyle = {
       background: `conic-gradient(#3B82F6 0% ${fuelPct}%, #FF5B04 ${fuelPct}% ${fuelPct + maintPct}%, #64748B ${fuelPct + maintPct}% 100%)`,
-      width: '160px',
-      height: '160px',
+      width: '120px',
+      height: '120px',
       borderRadius: '50%',
-      boxShadow: 'inset 0 0 0 24px white'
+      boxShadow: 'inset 0 0 0 16px white'
     };
 
     return {
@@ -327,10 +334,10 @@ const Reports = () => {
 
       {/* KPI Cards Panel */}
       <div className="kpi-grid">
-        {canViewFinancials && <KpiCard title="Operational Cost" value={formatCurrency(grandTotal)} color="orange" />}
-        {canViewFinancials && <KpiCard title="Fuel Cost" value={formatCurrency(fuel)} color="blue" />}
-        {canViewFinancials && <KpiCard title="Maintenance Cost" value={formatCurrency(maintenance)} color="blue" />}
-        {canViewFinancials && <KpiCard title="Other Expenses" value={formatCurrency(other)} color="blue" />}
+        {canViewFinancials && <KpiCard title="Operational Cost" value={formatCurrencyCompact(grandTotal)} color="orange" />}
+        {canViewFinancials && <KpiCard title="Fuel Cost" value={formatCurrencyCompact(fuel)} color="blue" />}
+        {canViewFinancials && <KpiCard title="Maintenance Cost" value={formatCurrencyCompact(maintenance)} color="blue" />}
+        {canViewFinancials && <KpiCard title="Other Expenses" value={formatCurrencyCompact(other)} color="blue" />}
         <KpiCard title="Vehicles In Shop" value={dashboardData?.vehicles_in_shop || 0} color="orange" />
         <KpiCard title="Active Trips" value={dashboardData?.active_trips || 0} color="blue" />
       </div>
@@ -342,7 +349,7 @@ const Reports = () => {
         {canViewFinancials && (
           <div className="report-section-card">
             <h2>Operational Cost breakdown</h2>
-            <div style={{ display: 'grid', gridTemplateColumns: '1.2fr 1fr', gap: '20px', alignItems: 'center' }}>
+            <div style={{ display: 'grid', gridTemplateColumns: '1.5fr 1fr', gap: '10px', alignItems: 'center' }}>
               <table className="trips-table">
                 <tbody>
                   <tr>
@@ -427,7 +434,7 @@ const Reports = () => {
                     return (
                       <BarRow 
                         key={d.vehicle_id}
-                        label={`Vehicle #${d.vehicle_id}`} 
+                        label={d.registration_number || `Vehicle #${d.vehicle_id}`} 
                         percentage={pct} 
                         valueText={`${d.fuel_efficiency.toFixed(1)} km/L`}
                         color="#3B82F6"
@@ -456,7 +463,7 @@ const Reports = () => {
                   return (
                     <BarRow 
                       key={d.vehicle_id}
-                      label={`Vehicle #${d.vehicle_id}`}
+                      label={d.registration_number}
                       percentage={pct}
                       valueText={formatCurrency(d.total_cost)}
                       color="#FF5B04"
