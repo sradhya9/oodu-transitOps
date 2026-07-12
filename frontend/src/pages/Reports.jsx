@@ -6,7 +6,7 @@ import {
   getFleetUtilization,
   getVehicleROI,
   getOperationalCost,
-  exportReportCSV
+  exportReportFile
 } from '../services/reportService';
 import { getMaintenanceLogs } from '../services/maintenanceService';
 import '../styles/dashboard.css';
@@ -145,8 +145,8 @@ const Reports = () => {
     const maintPct = grandTotal > 0 ? (maintenance / grandTotal) * 100 : 0;
     const otherPct = grandTotal > 0 ? (other / grandTotal) * 100 : 0;
 
-    const maxFuelEfficiency = fuelEfficiencyData.length > 0 
-      ? Math.max(...fuelEfficiencyData.map((d) => d.fuel_efficiency)) 
+    const maxFuelEfficiency = fuelEfficiencyData.length > 0
+      ? Math.max(...fuelEfficiencyData.map((d) => d.fuel_efficiency))
       : 1;
 
     const maxMaintenanceCost = maintenanceChartData.length > 0
@@ -222,106 +222,82 @@ const Reports = () => {
         <h1 className="page-title">Reports & Analytics</h1>
         {canViewFinancials && (
           <div style={{ position: 'relative' }}>
-            <button className="btn-primary" onClick={() => setDropdownOpen(!dropdownOpen)}>
-              Export CSV ▼
+            <button className="btn-secondary" onClick={() => setDropdownOpen(!dropdownOpen)}>
+              <span className="icon"></span> Export Reports ▼
             </button>
-          {dropdownOpen && (
-            <div style={{
-              position: 'absolute',
-              right: 0,
-              top: '42px',
-              backgroundColor: 'white',
-              border: '1px solid var(--border-color)',
-              borderRadius: '6px',
-              boxShadow: '0 4px 6px -1px rgba(0,0,0,0.1)',
-              zIndex: 100,
-              minWidth: '220px',
-              display: 'flex',
-              flexDirection: 'column',
-              padding: '6px 0'
-            }}>
-              <button 
-                style={{
-                  padding: '10px 16px',
-                  textDecoration: 'none',
-                  color: 'var(--text-dark)',
-                  fontSize: '0.85rem',
-                  fontWeight: '500',
-                  textAlign: 'left',
-                  cursor: 'pointer',
-                  border: 'none',
-                  background: 'none',
-                  display: 'block',
-                  width: '100%'
-                }}
-                className="dropdown-item"
-                onClick={() => { setDropdownOpen(false); exportReportCSV('maintenance', 'maintenance_report.csv'); }}
-              >
-                Export Maintenance CSV
-              </button>
-              <button 
-                style={{
-                  padding: '10px 16px',
-                  textDecoration: 'none',
-                  color: 'var(--text-dark)',
-                  fontSize: '0.85rem',
-                  fontWeight: '500',
-                  textAlign: 'left',
-                  cursor: 'pointer',
-                  border: 'none',
-                  background: 'none',
-                  borderTop: '1px solid var(--card-border)',
-                  display: 'block',
-                  width: '100%'
-                }}
-                className="dropdown-item"
-                onClick={() => { setDropdownOpen(false); exportReportCSV('fuel', 'fuel_logs_report.csv'); }}
-              >
-                Export Fuel Logs CSV
-              </button>
-              <button 
-                style={{
-                  padding: '10px 16px',
-                  textDecoration: 'none',
-                  color: 'var(--text-dark)',
-                  fontSize: '0.85rem',
-                  fontWeight: '500',
-                  textAlign: 'left',
-                  cursor: 'pointer',
-                  border: 'none',
-                  background: 'none',
-                  borderTop: '1px solid var(--card-border)',
-                  display: 'block',
-                  width: '100%'
-                }}
-                className="dropdown-item"
-                onClick={() => { setDropdownOpen(false); exportReportCSV('expenses', 'expense_report.csv'); }}
-              >
-                Export Expense CSV
-              </button>
-              <button 
-                style={{
-                  padding: '10px 16px',
-                  textDecoration: 'none',
-                  color: 'var(--text-dark)',
-                  fontSize: '0.85rem',
-                  fontWeight: '500',
-                  textAlign: 'left',
-                  cursor: 'pointer',
-                  border: 'none',
-                  background: 'none',
-                  borderTop: '1px solid var(--card-border)',
-                  display: 'block',
-                  width: '100%'
-                }}
-                className="dropdown-item"
-                onClick={() => { setDropdownOpen(false); exportReportCSV('operational-cost', 'operational_cost_report.csv'); }}
-              >
-                Export Operational Cost CSV
-              </button>
-            </div>
-          )}
-        </div>
+            {dropdownOpen && (
+              <div style={{
+                position: 'absolute',
+                right: 0,
+                top: '42px',
+                backgroundColor: 'white',
+                border: '1px solid var(--border-color)',
+                borderRadius: '6px',
+                boxShadow: '0 4px 6px -1px rgba(0,0,0,0.1)',
+                zIndex: 100,
+                minWidth: '220px',
+                display: 'flex',
+                flexDirection: 'column',
+                padding: '6px 0'
+              }}>
+                <div style={{ padding: '8px 16px', fontSize: '0.8rem', fontWeight: 'bold', color: 'var(--text-light)' }}>Maintenance Report</div>
+                <div style={{ display: 'flex' }}>
+                  <button
+                    style={{ flex: 1, padding: '8px', border: 'none', background: 'none', cursor: 'pointer', fontSize: '0.85rem', color: 'var(--text-dark)' }}
+                    className="dropdown-item"
+                    onClick={() => { setDropdownOpen(false); exportReportFile('maintenance', 'maintenance_report.csv', 'csv'); }}
+                  >CSV</button>
+                  <button
+                    style={{ flex: 1, padding: '8px', border: 'none', background: 'none', cursor: 'pointer', fontSize: '0.85rem', color: 'var(--text-dark)' }}
+                    className="dropdown-item"
+                    onClick={() => { setDropdownOpen(false); exportReportFile('maintenance', 'maintenance_report.pdf', 'pdf'); }}
+                  >PDF</button>
+                </div>
+
+                <div style={{ borderTop: '1px solid var(--card-border)', padding: '8px 16px', fontSize: '0.8rem', fontWeight: 'bold', color: 'var(--text-light)' }}>Fuel Logs Report</div>
+                <div style={{ display: 'flex' }}>
+                  <button
+                    style={{ flex: 1, padding: '8px', border: 'none', background: 'none', cursor: 'pointer', fontSize: '0.85rem', color: 'var(--text-dark)' }}
+                    className="dropdown-item"
+                    onClick={() => { setDropdownOpen(false); exportReportFile('fuel', 'fuel_logs_report.csv', 'csv'); }}
+                  >CSV</button>
+                  <button
+                    style={{ flex: 1, padding: '8px', border: 'none', background: 'none', cursor: 'pointer', fontSize: '0.85rem', color: 'var(--text-dark)' }}
+                    className="dropdown-item"
+                    onClick={() => { setDropdownOpen(false); exportReportFile('fuel', 'fuel_logs_report.pdf', 'pdf'); }}
+                  >PDF</button>
+                </div>
+
+                <div style={{ borderTop: '1px solid var(--card-border)', padding: '8px 16px', fontSize: '0.8rem', fontWeight: 'bold', color: 'var(--text-light)' }}>Expense Report</div>
+                <div style={{ display: 'flex' }}>
+                  <button
+                    style={{ flex: 1, padding: '8px', border: 'none', background: 'none', cursor: 'pointer', fontSize: '0.85rem', color: 'var(--text-dark)' }}
+                    className="dropdown-item"
+                    onClick={() => { setDropdownOpen(false); exportReportFile('expenses', 'expense_report.csv', 'csv'); }}
+                  >CSV</button>
+                  <button
+                    style={{ flex: 1, padding: '8px', border: 'none', background: 'none', cursor: 'pointer', fontSize: '0.85rem', color: 'var(--text-dark)' }}
+                    className="dropdown-item"
+                    onClick={() => { setDropdownOpen(false); exportReportFile('expenses', 'expense_report.pdf', 'pdf'); }}
+                  >PDF</button>
+                </div>
+
+                <div style={{ borderTop: '1px solid var(--card-border)', padding: '8px 16px', fontSize: '0.8rem', fontWeight: 'bold', color: 'var(--text-light)' }}>Operational Cost</div>
+                <div style={{ display: 'flex' }}>
+                  <button
+                    style={{ flex: 1, padding: '8px', border: 'none', background: 'none', cursor: 'pointer', fontSize: '0.85rem', color: 'var(--text-dark)' }}
+                    className="dropdown-item"
+                    onClick={() => { setDropdownOpen(false); exportReportFile('operational-cost', 'operational_cost_report.csv', 'csv'); }}
+                  >CSV</button>
+                  <button
+                    style={{ flex: 1, padding: '8px', border: 'none', background: 'none', cursor: 'pointer', fontSize: '0.85rem', color: 'var(--text-dark)' }}
+                    className="dropdown-item"
+                    onClick={() => { setDropdownOpen(false); exportReportFile('operational-cost', 'operational_cost_report.pdf', 'pdf'); }}
+                  >PDF</button>
+                </div>
+              </div>
+            )}
+          </div>
         )}
       </div>
 
@@ -338,12 +314,12 @@ const Reports = () => {
       {/* Reports Analysis Details Grid */}
       <div style={{ display: 'flex', flexDirection: 'column', gap: '24px', marginTop: '24px' }}>
         <div className="reports-grid" style={{ marginTop: 0, alignItems: 'start' }}>
-          
+
           {canViewFinancials ? (
             <>
               {/* Left Column */}
               <div style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
-                
+
                 {/* Section 1: Operational Cost Table & Pie Chart */}
                 <div className="report-section-card" style={{ width: 'fit-content' }}>
                   <h2>Operational Cost breakdown</h2>
@@ -403,7 +379,7 @@ const Reports = () => {
                       {maintenanceChartData.map((d) => {
                         const pct = maxMaintenanceCost > 0 ? (d.total_cost / maxMaintenanceCost) * 100 : 0;
                         return (
-                          <BarRow 
+                          <BarRow
                             key={d.vehicle_id}
                             label={d.registration_number}
                             percentage={pct}
@@ -429,10 +405,10 @@ const Reports = () => {
                       {fuelEfficiencyData.map((d) => {
                         const pct = maxFuelEfficiency > 0 ? (d.fuel_efficiency / maxFuelEfficiency) * 100 : 0;
                         return (
-                          <BarRow 
+                          <BarRow
                             key={d.vehicle_id}
-                            label={d.registration_number || `Vehicle #${d.vehicle_id}`} 
-                            percentage={pct} 
+                            label={d.registration_number || `Vehicle #${d.vehicle_id}`}
+                            percentage={pct}
                             valueText={`${d.fuel_efficiency.toFixed(1)} km/L`}
                             color="#3B82F6"
                           />
@@ -450,7 +426,7 @@ const Reports = () => {
 
               {/* Right Column */}
               <div style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
-                
+
                 {/* Section 2a: Fuel Efficiency Table */}
                 <div className="report-section-card">
                   <h2>Fuel Efficiency by Vehicle</h2>
@@ -503,9 +479,9 @@ const Reports = () => {
                       </div>
                     </div>
                   ) : fleetUtilizationData?.status === 'pending_integration' ? (
-                    <PendingBanner 
-                      title="Integration Pending" 
-                      message={fleetUtilizationData.message} 
+                    <PendingBanner
+                      title="Integration Pending"
+                      message={fleetUtilizationData.message}
                       formula={fleetUtilizationData._todo}
                     />
                   ) : (
@@ -534,9 +510,9 @@ const Reports = () => {
                   </div>
                 </div>
               ) : fleetUtilizationData?.status === 'pending_integration' ? (
-                <PendingBanner 
-                  title="Integration Pending" 
-                  message={fleetUtilizationData.message} 
+                <PendingBanner
+                  title="Integration Pending"
+                  message={fleetUtilizationData.message}
                   formula={fleetUtilizationData._todo}
                 />
               ) : (
@@ -582,9 +558,9 @@ const Reports = () => {
                 </tbody>
               </table>
             ) : vehicleRoiData?.status === 'pending_integration' ? (
-              <PendingBanner 
-                title="Integration Pending" 
-                message={vehicleRoiData.message} 
+              <PendingBanner
+                title="Integration Pending"
+                message={vehicleRoiData.message}
                 formula={vehicleRoiData._todo}
               />
             ) : (
