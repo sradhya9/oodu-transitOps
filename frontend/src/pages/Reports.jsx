@@ -347,9 +347,9 @@ const Reports = () => {
         
         {/* Section 1: Operational Cost Table & Pie Chart */}
         {canViewFinancials && (
-          <div className="report-section-card">
+          <div className="report-section-card" style={{ width: 'fit-content', alignSelf: 'start', paddingRight: '48px' }}>
             <h2>Operational Cost breakdown</h2>
-            <div style={{ display: 'grid', gridTemplateColumns: '1.5fr 1fr', gap: '10px', alignItems: 'center' }}>
+            <div style={{ display: 'grid', gridTemplateColumns: 'auto auto', gap: '40px', alignItems: 'center' }}>
               <table className="trips-table">
                 <tbody>
                   <tr>
