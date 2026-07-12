@@ -36,6 +36,8 @@ def get_dashboard_stats():
         available_vehicles = db.session.query(func.count(Vehicle.id)).filter(Vehicle.status == 'Available').scalar() or 0
         maintenance_vehicles = db.session.query(func.count(Vehicle.id)).filter(Vehicle.status == 'In Shop').scalar() or 0
         on_trip_vehicles = db.session.query(func.count(Vehicle.id)).filter(Vehicle.status == 'On Trip').scalar() or 0
+        retired_vehicles = db.session.query(func.count(Vehicle.id)).filter(Vehicle.status == 'Retired').scalar() or 0
+        total_vehicles_all = total_vehicles + retired_vehicles
 
         # Trips
         active_trips = db.session.query(func.count(Trip.id)).filter(Trip.status == 'Dispatched').scalar() or 0
@@ -58,7 +60,10 @@ def get_dashboard_stats():
             "activeTrips": active_trips,
             "pendingTrips": pending_trips,
             "driversOnDuty": drivers_on_duty,
-            "fleetUtilization": fleet_utilization
+            "fleetUtilization": fleet_utilization,
+            "onTripVehicles": on_trip_vehicles,
+            "retiredVehicles": retired_vehicles,
+            "totalVehiclesAll": total_vehicles_all
         }), 200
 
     except Exception as e:
