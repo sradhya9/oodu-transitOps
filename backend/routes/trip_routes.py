@@ -230,9 +230,9 @@ def complete_trip(id):
             return jsonify({'success': False, 'message': 'Only Dispatched trips can be completed'}), 400
             
         data = request.json
-        end_odometer = float(data.get('end_odometer', 0))
-        revenue = float(data.get('revenue', 0))
-        fuel_consumed = float(data.get('fuel_consumed', 0))
+        end_odometer = float(data.get('end_odometer') or 0)
+        revenue = float(data.get('revenue') or 0)
+        fuel_consumed = float(data.get('fuel_consumed') or 0)
         
         if trip.start_odometer and end_odometer < float(trip.start_odometer):
             return jsonify({'success': False, 'message': 'Invalid completion data: End odometer cannot be less than start odometer'}), 400
