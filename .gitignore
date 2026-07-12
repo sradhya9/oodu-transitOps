@@ -31,3 +31,7 @@ yarn-debug.log*
 yarn-error.log*
 
 requirement.pdf
+
+.env
+
+./backend/env
